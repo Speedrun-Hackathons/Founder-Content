@@ -230,20 +230,34 @@ function HeroMock() {
   return (
     <div className="relative mx-auto w-full max-w-md lg:max-w-none" aria-hidden>
       <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-brand-500/20 blur-2xl" />
-      <div className="rounded-3xl border border-white/10 bg-white/95 p-5 text-zinc-900 shadow-2xl shadow-black/40">
+      <div className="relative rounded-3xl border border-white/10 bg-white/95 p-5 text-zinc-900 shadow-2xl shadow-black/40">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-display font-semibold">Instagram</span>
-            <span className="text-xs text-zinc-500">Carousel, 3 images</span>
+            <span className="font-display font-semibold">X</span>
+            <span className="text-xs text-zinc-500">Image post</span>
           </div>
           <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-[11px] text-zinc-600">Run time 6 min</span>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <MockVariant label="A" angle="Time saved" color="#2a78d6" tint="from-brand-500 to-brand-700" rate="2.9%" />
-          <MockVariant label="B" angle="A/B testing" color="#eb6834" tint="from-coral-400 to-coral-500" rate="4.1%" winner />
+          <MockVariant label="A" angle="Time saved" color="#2a78d6" rate="2.9%">
+            <XPost chart="bars" />
+          </MockVariant>
+          <MockVariant label="B" angle="A/B testing" color="#eb6834" rate="4.1%" winner>
+            <XPost chart="split" />
+          </MockVariant>
         </div>
       </div>
-      <div className="absolute -bottom-6 -left-4 hidden rounded-2xl border border-white/10 bg-ink/90 px-4 py-3 text-xs text-white shadow-xl backdrop-blur sm:block">
+      <div className="relative z-10 -mt-8 ml-auto hidden w-[82%] rotate-2 rounded-3xl border border-white/10 bg-white p-4 text-zinc-900 shadow-2xl shadow-black/50 sm:block">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-display font-semibold">LinkedIn</span>
+          <span className="text-zinc-500">Variant A vs B</span>
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-2.5">
+          <LinkedInPost tone="brand" />
+          <LinkedInPost tone="coral" />
+        </div>
+      </div>
+      <div className="absolute -left-6 bottom-10 z-20 hidden rounded-2xl border border-white/10 bg-ink/90 px-4 py-3 text-xs text-white shadow-xl backdrop-blur sm:block">
         <div className="text-white/60">Scheduled</div>
         <div className="mt-0.5 font-semibold">Tue 9:00, LinkedIn + X</div>
       </div>
@@ -255,34 +269,100 @@ function MockVariant({
   label,
   angle,
   color,
-  tint,
   rate,
   winner = false,
+  children,
 }: {
   label: string;
   angle: string;
   color: string;
-  tint: string;
   rate: string;
   winner?: boolean;
+  children: React.ReactNode;
 }) {
   return (
-    <div className={`rounded-2xl border p-3 ${winner ? "border-emerald-500 ring-2 ring-emerald-500/30" : "border-zinc-200"}`}>
-      <div className="flex items-center justify-between text-[11px]">
+    <div className={`rounded-2xl border p-2.5 ${winner ? "border-emerald-500 ring-2 ring-emerald-500/30" : "border-zinc-200"}`}>
+      <div className="flex items-center justify-between px-0.5 text-[11px]">
         <span className="inline-flex items-center gap-1.5 font-medium text-zinc-700">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
           Variant {label}
         </span>
         {winner && <span className="rounded-full bg-emerald-50 px-1.5 py-0.5 font-medium text-emerald-700">Winner</span>}
       </div>
-      <div className={`mt-2 aspect-[4/3] rounded-xl bg-linear-to-br ${tint}`} />
-      <div className="mt-2 space-y-1">
-        <div className="h-2 w-11/12 rounded bg-zinc-200" />
-        <div className="h-2 w-3/4 rounded bg-zinc-200" />
-      </div>
-      <div className="mt-3 flex items-center justify-between text-[11px] text-zinc-500">
+      <div className="mt-2">{children}</div>
+      <div className="mt-2.5 flex items-center justify-between px-0.5 text-[11px] text-zinc-500">
         <span>{angle}</span>
         <span className="font-semibold text-zinc-800">{rate}</span>
+      </div>
+    </div>
+  );
+}
+
+// A blurred stand-in for an X post: the layout reads as X, the words do not.
+function XPost({ chart }: { chart: "bars" | "split" }) {
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white p-2.5">
+      <div className="flex items-start gap-2">
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-600 text-[9px] font-bold text-white">LL</span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1 text-[10px] leading-none">
+            <span className="whitespace-nowrap font-semibold text-zinc-900">Lumen Labs</span>
+            <span className="h-2.5 w-2.5 rounded-full bg-sky-500" />
+            <span className="truncate text-zinc-400">@lumenlabs</span>
+          </div>
+          <p className="mt-1.5 select-none text-[9.5px] leading-snug text-zinc-700 blur-[1.5px]">
+            {chart === "bars"
+              ? "We cut onboarding from 3 days to 20 minutes. Here is what changed for our first 100 customers."
+              : "Two versions of the same launch post. One got 41% more clicks. Guess which one."}
+          </p>
+        </div>
+        <span className="text-[11px] font-black leading-none text-zinc-900">X</span>
+      </div>
+      <div className="mt-2 overflow-hidden rounded-lg border border-zinc-100 bg-zinc-50 p-2">
+        {chart === "bars" ? (
+          <div className="flex h-14 items-end gap-1 blur-[0.5px]">
+            {[30, 45, 38, 60, 52, 78, 95].map((h, i) => (
+              <span key={i} className="flex-1 rounded-sm bg-brand-400" style={{ height: `${h}%`, opacity: 0.45 + i * 0.08 }} />
+            ))}
+          </div>
+        ) : (
+          <div className="grid h-14 grid-cols-2 gap-1.5 blur-[0.5px]">
+            <span className="rounded-md bg-zinc-200" />
+            <span className="rounded-md bg-coral-400/70" />
+          </div>
+        )}
+      </div>
+      <div className="mt-2 flex justify-between px-0.5 text-[9px] text-zinc-400">
+        <span>&#9675; 24</span>
+        <span>&#8645; 61</span>
+        <span>&#9825; {chart === "bars" ? "312" : "448"}</span>
+        <span>&#9636; 9K</span>
+      </div>
+    </div>
+  );
+}
+
+// A blurred stand-in for a LinkedIn post.
+function LinkedInPost({ tone }: { tone: "brand" | "coral" }) {
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white p-2">
+      <div className="flex items-center gap-1.5">
+        <span className="flex h-5 w-5 items-center justify-center rounded bg-brand-600 text-[8px] font-bold text-white">LL</span>
+        <div className="min-w-0 flex-1 leading-none">
+          <div className="text-[9px] font-semibold text-zinc-900">Lumen Labs</div>
+          <div className="mt-0.5 text-[8px] text-zinc-400">2,140 followers</div>
+        </div>
+        <span className="rounded-sm bg-[#0a66c2] px-1 text-[8px] font-bold leading-[12px] text-white">in</span>
+      </div>
+      <div className="mt-1.5 space-y-1 blur-[1px]">
+        <div className="h-1.5 w-full rounded bg-zinc-200" />
+        <div className="h-1.5 w-4/5 rounded bg-zinc-200" />
+      </div>
+      <div className={`mt-1.5 h-10 rounded-md ${tone === "brand" ? "bg-brand-200" : "bg-coral-300"}`} />
+      <div className="mt-1.5 flex justify-between border-t border-zinc-100 pt-1 text-[8px] text-zinc-400">
+        <span>Like</span>
+        <span>Comment</span>
+        <span>Repost</span>
       </div>
     </div>
   );
