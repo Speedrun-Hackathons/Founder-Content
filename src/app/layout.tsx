@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage" });
 
 export const metadata: Metadata = {
-  title: "Founder Content",
+  title: "SocialCoFounder",
   description: "Paste a company URL, get posts and ads generated, tested and scheduled.",
 };
 

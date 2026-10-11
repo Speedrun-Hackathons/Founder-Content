@@ -14,7 +14,7 @@ export function Logo({ tone = "dark" }: { tone?: "dark" | "light" }) {
     <span className="inline-flex items-center gap-2.5">
       <LogoMark />
       <span className={`whitespace-nowrap font-display text-lg font-semibold tracking-tight ${tone === "light" ? "text-white" : "text-ink"}`}>
-        Founder Content
+        SocialCoFounder
       </span>
     </span>
   );

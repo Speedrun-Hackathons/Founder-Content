@@ -85,7 +85,7 @@ export default async function Home() {
               Get a week of posts and <span className="text-coral-400">tested</span> Ads.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/70">
-              Founder Content reads your site, writes a Brief and a Voice you approve, then makes posts, images, Carousels and
+              SocialCoFounder reads your site, writes a Brief and a Voice you approve, then makes posts, images, Carousels and
               Ads in two Variants for every Platform. You pick the Winner. It schedules the rest.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
