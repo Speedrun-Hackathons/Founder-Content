@@ -141,7 +141,7 @@ export default function ContentPage() {
 
       {error && <p className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
-      <section className="mt-6 rounded-lg border border-zinc-200 bg-white p-5">
+      <section className="mt-6 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
         <h2 className="text-lg font-semibold">Write captions</h2>
         <p className="mt-1 text-sm text-zinc-600">
           One caption per Platform in your Voice. Each one is saved as a draft first; nothing is sent until you schedule or publish it.

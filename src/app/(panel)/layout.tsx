@@ -91,7 +91,13 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           <PanelNav layout="top" />
         </div>
       </header>
-      <main className="min-w-0 flex-1 px-4 py-6 sm:px-8 sm:py-10">{children}</main>
+      <main className="relative isolate min-w-0 flex-1 px-4 py-6 sm:px-8 sm:py-10">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(60%_100%_at_15%_0%,var(--color-brand-100),transparent),radial-gradient(40%_80%_at_90%_0%,color-mix(in_oklab,var(--color-coral-300)_45%,transparent),transparent)]"
+          aria-hidden
+        />
+        {children}
+      </main>
     </div>
   );
 }

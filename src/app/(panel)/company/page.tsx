@@ -120,7 +120,7 @@ export default function CompanyPage() {
       </p>
       {error && <p className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
-      <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-5">
+      <section className="mt-6 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
         <label htmlFor="company-url" className="block text-sm font-medium">
           Company URL
         </label>
@@ -176,7 +176,7 @@ export default function CompanyPage() {
       </section>
 
       {state.brief && (
-        <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-5">
+        <section className="mt-6 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Brief for {state.company?.name}</h2>
             <span

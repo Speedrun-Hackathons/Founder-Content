@@ -8,11 +8,14 @@ import {
   AlertIcon,
   Banner,
   Card,
+  ICONS,
+  Icon,
   PageHeader,
   RateBars,
   Spinner,
   StandInBadge,
   VariantTag,
+  VARIANT_COLOR,
   WinnerTag,
   compact,
   percent,
@@ -133,7 +136,12 @@ export default function AdsPage() {
 
       <Card className="mt-6 p-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold">New Run</h2>
+          <h2 className="flex items-center gap-2 text-sm font-semibold">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+              <Icon path={ICONS.run} className="h-3.5 w-3.5" />
+            </span>
+            New Run
+          </h2>
           <span className="text-xs text-zinc-500">Uses your approved Brief and Voice</span>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
@@ -250,6 +258,7 @@ function RunSection({
   return (
     <section>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-200 pb-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-brand-500" aria-hidden />
         <h2 className="text-lg font-semibold">Run</h2>
         <span className="rounded-md bg-zinc-100 px-2 py-0.5 font-mono text-xs text-zinc-600">{group.runId}</span>
         {run && <span className="text-sm text-zinc-500">{new Date(run.startedAt).toLocaleString()}</span>}
@@ -369,7 +378,10 @@ function VariantPanel({
   const angle = angleOf(variant);
   const over = variant.text.length > maxChars;
   return (
-    <div className={`flex flex-col bg-white p-5 ${winner ? "ring-2 ring-inset ring-emerald-500" : ""}`}>
+    <div
+      className={`flex flex-col border-t-4 bg-white p-5 ${winner ? "ring-2 ring-inset ring-emerald-500" : ""}`}
+      style={{ borderTopColor: VARIANT_COLOR[variant.label] }}
+    >
       <div className="flex h-6 items-center justify-between gap-2">
         <VariantTag label={variant.label} />
         {winner && <WinnerTag />}

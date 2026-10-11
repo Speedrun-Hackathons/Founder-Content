@@ -51,13 +51,60 @@ export function Banner({ tone, children }: { tone: "error" | "notice" | "warning
   );
 }
 
-export function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
+const TONES = {
+  brand: { chip: "bg-brand-50 text-brand-600", bar: "bg-brand-500" },
+  coral: { chip: "bg-coral-400/15 text-coral-500", bar: "bg-coral-400" },
+  emerald: { chip: "bg-emerald-50 text-emerald-600", bar: "bg-emerald-500" },
+  sky: { chip: "bg-sky-50 text-sky-600", bar: "bg-sky-500" },
+} as const;
+
+export const ICONS = {
+  run: "M5 4l14 8-14 8z",
+  ad: "M5 5h6v14H5zM13 5h6v14h-6z",
+  winner: "M8 4h8v5a4 4 0 0 1-8 0zM6 5H4v2a3 3 0 0 0 3 3M18 5h2v2a3 3 0 0 1-3 3M10 14h4v3h-4zM8 20h8",
+  post: "M5 5h14v10H8l-3 3z",
+  eye: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+  heart: "M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z",
+  clock: "M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z",
+} as const;
+
+export type Tone = keyof typeof TONES;
+
+export function Stat({
+  label,
+  value,
+  hint,
+  tone = "brand",
+  icon,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  tone?: Tone;
+  icon?: keyof typeof ICONS;
+}) {
   return (
-    <Card className="p-5">
-      <div className="text-sm text-zinc-500">{label}</div>
+    <Card className="relative overflow-hidden p-5">
+      <span className={`absolute inset-x-0 top-0 h-1 ${TONES[tone].bar}`} aria-hidden />
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-sm text-zinc-500">{label}</div>
+        {icon && (
+          <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${TONES[tone].chip}`}>
+            <Icon path={ICONS[icon]} />
+          </span>
+        )}
+      </div>
       <div className="mt-1 text-3xl font-semibold tracking-tight tabular-nums">{value}</div>
       {hint && <div className="mt-1 text-xs text-zinc-500">{hint}</div>}
     </Card>
+  );
+}
+
+export function Icon({ path, className = "h-[18px] w-[18px]" }: { path: string; className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d={path} />
+    </svg>
   );
 }
 

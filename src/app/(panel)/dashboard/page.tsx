@@ -35,31 +35,32 @@ export default function DashboardPage() {
       </PageHeader>
       {error && <Banner tone="error">{error}</Banner>}
 
-      <Card className="mt-6 grid gap-6 p-6 md:grid-cols-[1.4fr_1fr]">
+      <section className="relative isolate mt-6 grid gap-6 overflow-hidden rounded-2xl bg-ink p-6 text-white shadow-lg shadow-brand-900/20 md:grid-cols-[1.4fr_1fr] md:p-8">
+        <div className="absolute inset-0 -z-10 bg-cover bg-center" style={{ backgroundImage: "url(/landing/hero-bg.svg)" }} aria-hidden />
         <div>
-          <div className="text-sm text-zinc-500">Time in Runs, from URL to first Post</div>
-          <div className="mt-1 text-5xl font-semibold tracking-tight tabular-nums">
+          <div className="text-sm text-white/60">Time in Runs, from URL to first Post</div>
+          <div className="mt-2 font-display text-6xl font-semibold tracking-tight tabular-nums">
             {minutes}
-            <span className="ml-2 text-xl font-medium text-zinc-500">min</span>
+            <span className="ml-2 text-2xl font-medium text-white/60">min</span>
           </div>
-          <p className="mt-2 text-sm text-zinc-600">
+          <p className="mt-3 text-sm text-white/70">
             Across {timeSaved?.totalRuns ?? 0} finished Run{timeSaved?.totalRuns === 1 ? "" : "s"}, measured by the site.
           </p>
         </div>
-        <div className="rounded-xl bg-zinc-50 p-5">
-          <div className="text-sm text-zinc-500">By hand, from the survey</div>
-          <div className="mt-1 text-3xl font-semibold tabular-nums">
+        <div className="rounded-xl border border-white/10 bg-white/10 p-5 backdrop-blur">
+          <div className="text-sm text-coral-300">By hand, from the survey</div>
+          <div className="mt-1 font-display text-3xl font-semibold tabular-nums">
             {timeSaved ? `${timeSaved.surveyHoursPerWeekLow} to ${timeSaved.surveyHoursPerWeekHigh}` : "-"}
-            <span className="ml-2 text-base font-medium text-zinc-500">hours a week</span>
+            <span className="ml-2 text-base font-medium text-white/60">hours a week</span>
           </div>
-          {timeSaved && <p className="mt-2 text-xs text-zinc-500">{timeSaved.surveySource}</p>}
+          {timeSaved && <p className="mt-2 text-xs text-white/50">{timeSaved.surveySource}</p>}
         </div>
-      </Card>
+      </section>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-3">
-        <Stat label="Runs started" value={String(runs.length)} />
-        <Stat label="Ads generated" value={String(ads.length)} hint={ads.length > 0 ? `${ads.length * 2} Variants` : undefined} />
-        <Stat label="Winners picked" value={`${winners} of ${ads.length}`} />
+        <Stat label="Runs started" value={String(runs.length)} tone="brand" icon="run" />
+        <Stat label="Ads generated" value={String(ads.length)} hint={ads.length > 0 ? `${ads.length * 2} Variants` : undefined} tone="coral" icon="ad" />
+        <Stat label="Winners picked" value={`${winners} of ${ads.length}`} tone="emerald" icon="winner" />
       </div>
 
       <section className="mt-10">
@@ -70,11 +71,11 @@ export default function DashboardPage() {
               <p className="text-sm text-zinc-600">No Runs yet.</p>
               <p className="mt-1 text-sm text-zinc-500">
                 Add your Company URL on the{" "}
-                <Link className="font-medium text-zinc-900 underline" href="/company">
+                <Link className="font-medium text-brand-600 underline" href="/company">
                   Company
                 </Link>{" "}
                 page, approve the Brief, then start a Run on{" "}
-                <Link className="font-medium text-zinc-900 underline" href="/ads">
+                <Link className="font-medium text-brand-600 underline" href="/ads">
                   Ads
                 </Link>
                 .

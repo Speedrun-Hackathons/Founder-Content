@@ -275,7 +275,7 @@ function MockVariant({
         </span>
         {winner && <span className="rounded-full bg-emerald-50 px-1.5 py-0.5 font-medium text-emerald-700">Winner</span>}
       </div>
-      <div className={`mt-2 aspect-[4/3] rounded-xl bg-gradient-to-br ${tint}`} />
+      <div className={`mt-2 aspect-[4/3] rounded-xl bg-linear-to-br ${tint}`} />
       <div className="mt-2 space-y-1">
         <div className="h-2 w-11/12 rounded bg-zinc-200" />
         <div className="h-2 w-3/4 rounded bg-zinc-200" />

@@ -72,10 +72,12 @@ function PostsSection({ rows, source, error }: { rows: AnalyticsRow[]; source: s
       </div>
       {error && <Banner tone="warning">The posting service did not answer: {error}</Banner>}
       <div className="mt-4 grid gap-4 sm:grid-cols-3">
-        <Stat label="Posts published" value={compact(total("posts"))} />
-        <Stat label="Impressions" value={compact(impressions)} />
+        <Stat label="Posts published" value={compact(total("posts"))} tone="brand" icon="post" />
+        <Stat label="Impressions" value={compact(impressions)} tone="sky" icon="eye" />
         <Stat
           label="Engagements"
+          tone="coral"
+          icon="heart"
           value={compact(total("engagements"))}
           hint={impressions > 0 ? `${percent(total("engagements") / impressions)} of impressions` : undefined}
         />
@@ -177,13 +179,13 @@ function TimeSavedSection({ timeSaved }: { timeSaved: TimeSaved }) {
   return (
     <section className="mt-10">
       <h2 className="text-lg font-semibold">Time saved</h2>
-      <Card className="mt-4 p-5">
+      <div className="mt-4 rounded-2xl border border-coral-300/60 bg-linear-to-br from-coral-400/15 via-white to-brand-100 p-5 shadow-sm">
         <p className="text-sm text-zinc-700">
           {timeSaved.totalRuns} finished Run{timeSaved.totalRuns === 1 ? "" : "s"}, {minutes} minute{minutes === 1 ? "" : "s"} in total, against{" "}
           {timeSaved.surveyHoursPerWeekLow} to {timeSaved.surveyHoursPerWeekHigh} hours a week by hand.
         </p>
         <p className="mt-2 text-xs text-zinc-500">{timeSaved.surveySource}</p>
-      </Card>
+      </div>
     </section>
   );
 }
