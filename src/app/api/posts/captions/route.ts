@@ -1,14 +1,16 @@
 // #7: one caption per chosen Platform in the Voice, written by the posting service, and a draft per
 // Platform. A Platform that failed answers with its own error next to the ones that worked.
 // With { mediaUrl, transcript } the captions are written about a video (its transcript joins the
-// Brief) and every draft carries the video, which TikTok and YouTube need.
+// Brief) and every draft carries the video, which TikTok and YouTube need. With { blogId, link } they
+// promote a saved blog post and end with its link.
 
 import { fail, isResponse, json, readJson } from "@/lib/http";
 import { ensureCompanyLoaded } from "@/lib/content/archive";
+import { blogStore } from "@/lib/content/blogs";
 import { isPlatform, PLATFORMS, type Platform, type Post, type Run } from "@/lib/model";
 import { applyProviderPost, serviceFailure, socialStreamline } from "@/lib/social";
 import { captionTranscript } from "@/lib/social/transcript";
-import { getState, newId, now, recordEvent } from "@/lib/store";
+import { founderId, getState, newId, now, recordEvent } from "@/lib/store";
 
 type Result = { platform: Platform; ok: true; post: Post } | { platform: Platform; ok: false; error: string };
 
@@ -36,6 +38,21 @@ export async function POST(req: Request) {
   }
   const transcript = typeof body.transcript === "string" ? body.transcript.trim() : "";
 
+  // { blogId, link? } writes posts that promote a saved blog post.
+  let blog: { title: string; markdown: string; link?: string } | undefined;
+  if (typeof body.blogId === "string" && body.blogId) {
+    const link = typeof body.link === "string" ? body.link.trim() : "";
+    if (link && !link.startsWith("https://")) return fail("bad_link", `link "${link}" must be a public https URL.`, 422);
+    let saved;
+    try {
+      saved = await blogStore().get(founderId(), body.blogId);
+    } catch (err) {
+      return fail("blogs_unavailable", `The blog post could not be read: ${err instanceof Error ? err.message : String(err)}`, 502);
+    }
+    if (!saved) return fail("no_blog", `No blog post ${body.blogId}.`, 404);
+    blog = { title: saved.title, markdown: saved.markdown, link: link || undefined };
+  }
+
   let client;
   try {
     client = socialStreamline();
@@ -49,7 +66,7 @@ export async function POST(req: Request) {
 
   let captions;
   try {
-    captions = await client.generateCaptions(captionTranscript(state.brief.text, state.voice, transcript, state.documents), platforms, `captions:${run.id}`);
+    captions = await client.generateCaptions(captionTranscript({ brief: state.brief.text, voice: state.voice, documents: state.documents, video: transcript, blog }), platforms, `captions:${run.id}`);
   } catch (err) {
     return serviceFailure(err);
   }

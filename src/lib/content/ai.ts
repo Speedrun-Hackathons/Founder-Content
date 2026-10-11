@@ -25,7 +25,7 @@ const OPENAI = "https://api.openai.com/v1";
 const MAX_DOCUMENT_CHARS = 8_000;
 const MAX_DOCUMENTS_CHARS = 30_000;
 
-function textModel(): string {
+export function textModel(): string {
   return process.env.OPENAI_TEXT_MODEL || "gpt-5-mini";
 }
 
@@ -80,7 +80,8 @@ export function userPrompt(request: BriefRequest): string {
   return lines.join("\n\n");
 }
 
-async function callOpenAI(body: unknown): Promise<Record<string, unknown>> {
+/** One Chat Completions call. Throws OpenAINotConfigured without a key, and the service's reason otherwise. */
+export async function callOpenAI(body: unknown, timeoutMs = 90_000): Promise<Record<string, unknown>> {
   const key = process.env.OPENAI_API_KEY;
   if (!key) throw new OpenAINotConfigured("OPENAI_API_KEY is not set on the server.");
   let response: Response;
@@ -89,7 +90,7 @@ async function callOpenAI(body: unknown): Promise<Record<string, unknown>> {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(90_000),
+      signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (error) {
     throw new Error(`OpenAI could not be reached: ${error instanceof Error ? error.message : String(error)}`);
