@@ -1,6 +1,9 @@
+import { generateAds, saveFailures } from "@/lib/ads/generate";
+import { publicBaseUrl } from "@/lib/ads/media";
+import { track } from "@/lib/analytics/events";
 import { fail, isResponse, json, readJson } from "@/lib/http";
-import { isPlatform, PLATFORMS, type Platform } from "@/lib/model";
-import { createRun, getState, recordEvent } from "@/lib/store";
+import { isPlatform, PLATFORMS, type Platform, type Run } from "@/lib/model";
+import { getState, newId, now } from "@/lib/store";
 
 export function GET() {
   return json({ runs: getState().runs });
@@ -25,10 +28,29 @@ export async function POST(req: Request) {
     }
     if (!platforms.includes(value)) platforms.push(value);
   }
-  const result = createRun(platforms);
-  recordEvent("run_started", { runId: result.run.id, platforms });
-  for (const ad of result.ads) {
-    recordEvent("variant_generated", { adId: ad.id, platform: ad.platform, variants: ad.variants.map((v) => v.id) });
+  const { company, voice } = state;
+  if (!company || !voice) return fail("no_voice", "No Company or Voice yet. Add the Company URL first.", 404);
+  const run: Run = {
+    id: newId("run"),
+    briefId: state.brief.id,
+    platforms,
+    startedAt: now(),
+    publishedAt: null,
+    runTimeSeconds: null,
+  };
+  state.runs.push(run);
+  await track("run_started", { runId: run.id, platforms });
+  const { ads, failures } = await generateAds({
+    run,
+    brief: state.brief.text,
+    voice,
+    company: { name: company.name, url: company.url },
+    baseUrl: publicBaseUrl(req),
+  });
+  state.ads.push(...ads);
+  saveFailures(run.id, failures);
+  for (const ad of ads) {
+    await track("variant_generated", { adId: ad.id, platform: ad.platform, variants: ad.variants.map((v) => v.id) });
   }
-  return json(result, 201);
+  return json({ run, ads, failures }, 201);
 }
