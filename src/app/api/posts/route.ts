@@ -14,7 +14,7 @@ export async function GET() {
           try {
             const before = post.status;
             applyProviderPost(post, await client.getPost(post.providerPostId!));
-            recordIfPublished(post, before);
+            await recordIfPublished(post, before);
           } catch {
             // Keep the last known status; the next load tries again.
           }

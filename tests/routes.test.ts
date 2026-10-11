@@ -12,7 +12,8 @@ import { GET as getAccounts } from "@/app/api/accounts/route";
 import { GET as getAnalytics } from "@/app/api/analytics/route";
 import { GET as getEvents, POST as postEvents } from "@/app/api/events/route";
 import { installFakeAds } from "@/lib/ads/testing";
-import { setSocialStreamlineForTests } from "@/lib/social";
+import { resetSocialStreamline, setSocialStreamline } from "@/lib/social";
+import { installFakeContent, resetContent } from "@/lib/content/testing";
 import { resetStore } from "@/lib/store";
 import { fakeSocialStreamline } from "./fakes/social-streamline";
 
@@ -43,11 +44,15 @@ async function approvedBrief() {
 
 beforeEach(() => {
   resetStore();
+  installFakeContent();
   installFakeAds();
-  setSocialStreamlineForTests(fakeSocialStreamline().client);
+  setSocialStreamline(fakeSocialStreamline().client);
 });
 
-afterEach(() => setSocialStreamlineForTests(null));
+afterEach(() => {
+  resetSocialStreamline();
+  resetContent();
+});
 
 describe("health", () => {
   it("answers ok with a build id", async () => {

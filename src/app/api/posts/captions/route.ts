@@ -56,8 +56,9 @@ export async function POST(req: Request) {
         const post: Post = {
           id: newId("post"),
           runId: run.id,
-          variantId: null,
+          variantId: "",
           platform: caption.platform,
+          origin: "caption",
           text: caption.text,
           status: "draft",
           scheduledFor: null,

@@ -1,93 +1,161 @@
 "use client";
 
 import { api } from "@/lib/client";
-import type { Brief, Company, Voice } from "@/lib/model";
+import type { Brief, Company, Document, Voice } from "@/lib/model";
 import { useEffect, useState } from "react";
 
-type CompanyState = { company: Company | null; brief: Brief | null; voice: Voice | null };
+type CompanyState = { company: Company | null; documents: Document[]; brief: Brief | null; voice: Voice | null };
+type NewDocument = { filename: string; text: string };
+
+const TEXT_FILE = /\.(txt|md|markdown|csv|json|html?)$/i;
 
 export default function CompanyPage() {
   const [url, setUrl] = useState("");
-  const [docName, setDocName] = useState("");
-  const [docText, setDocText] = useState("");
-  const [state, setState] = useState<CompanyState>({ company: null, brief: null, voice: null });
+  const [documents, setDocuments] = useState<NewDocument[]>([]);
+  const [pasteName, setPasteName] = useState("");
+  const [pasteText, setPasteText] = useState("");
+  const [state, setState] = useState<CompanyState>({ company: null, documents: [], brief: null, voice: null });
   const [briefText, setBriefText] = useState("");
   const [tone, setTone] = useState("");
+  const [rules, setRules] = useState("");
+  const [banned, setBanned] = useState("");
   const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<"" | "building" | "saving">("");
 
   function load() {
     api<CompanyState>("/api/company")
       .then((s) => {
         setState(s);
+        if (s.company) setUrl((current) => current || s.company!.url);
         setBriefText(s.brief?.text ?? "");
         setTone(s.voice?.tone ?? "");
+        setRules(s.voice?.rules.join("\n") ?? "");
+        setBanned(s.voice?.bannedWords.join(", ") ?? "");
       })
       .catch((e: Error) => setError(e.message));
   }
 
   useEffect(load, []);
 
-  async function submitCompany() {
-    setBusy(true);
+  async function addFiles(files: FileList | null) {
+    if (!files) return;
+    setError("");
+    const added: NewDocument[] = [];
+    const refused: string[] = [];
+    for (const file of Array.from(files)) {
+      if (!TEXT_FILE.test(file.name)) refused.push(file.name);
+      else added.push({ filename: file.name, text: await file.text() });
+    }
+    setDocuments((current) => [...current, ...added]);
+    if (refused.length) {
+      setError(`${refused.join(", ")}: only text files (.txt, .md, .csv, .json, .html) can be read. Paste the text of a PDF or slide deck below.`);
+    }
+  }
+
+  function addPasted() {
+    if (!pasteText.trim()) return;
+    setDocuments((current) => [...current, { filename: pasteName.trim() || `notes-${current.length + 1}.txt`, text: pasteText }]);
+    setPasteName("");
+    setPasteText("");
+  }
+
+  async function build() {
+    setBusy("building");
     setError("");
     try {
-      const documents = docText.trim() ? [{ filename: docName || "notes.txt", text: docText }] : [];
       await api("/api/company", { method: "POST", body: JSON.stringify({ url, documents }) });
+      setDocuments([]);
       load();
     } catch (e) {
       setError((e as Error).message);
     } finally {
-      setBusy(false);
+      setBusy("");
     }
   }
 
   async function saveBrief(approved: boolean) {
-    setBusy(true);
+    setBusy("saving");
     setError("");
     try {
-      await api("/api/brief", { method: "PUT", body: JSON.stringify({ text: briefText, approved, voice: { tone } }) });
+      const voice = {
+        tone,
+        rules: rules.split("\n").map((r) => r.trim()).filter(Boolean),
+        bannedWords: banned.split(",").map((w) => w.trim()).filter(Boolean),
+      };
+      await api("/api/brief", { method: "PUT", body: JSON.stringify({ text: briefText, approved, voice }) });
       load();
     } catch (e) {
       setError((e as Error).message);
     } finally {
-      setBusy(false);
+      setBusy("");
     }
   }
+
+  const input = "mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm";
 
   return (
     <div className="max-w-3xl">
       <h1 className="text-2xl font-semibold">Company</h1>
+      <p className="mt-1 text-sm text-zinc-600">
+        Paste the Company URL and add Documents. The site reads them and writes a Brief and a Voice; nothing is generated until you approve the Brief.
+      </p>
       {error && <p className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+
       <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-5">
-        <label className="block text-sm font-medium">Company URL</label>
+        <label htmlFor="company-url" className="block text-sm font-medium">
+          Company URL
+        </label>
+        <input id="company-url" className={input} placeholder="https://example.com" value={url} onChange={(e) => setUrl(e.target.value)} />
+
+        <h2 className="mt-5 text-sm font-medium">Documents (optional)</h2>
+        <p className="text-xs text-zinc-500">A deck, a product sheet or notes, so the Brief rests on more than the home page.</p>
         <input
-          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2"
-          placeholder="https://example.com"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          type="file"
+          multiple
+          accept=".txt,.md,.markdown,.csv,.json,.html,.htm,text/*"
+          className="mt-2 block text-sm"
+          onChange={(e) => {
+            void addFiles(e.target.files);
+            e.target.value = "";
+          }}
         />
-        <label className="mt-4 block text-sm font-medium">Document (optional)</label>
-        <input
-          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2"
-          placeholder="filename, such as deck.txt"
-          value={docName}
-          onChange={(e) => setDocName(e.target.value)}
-        />
-        <textarea
-          className="mt-2 h-28 w-full rounded-md border border-zinc-300 px-3 py-2"
-          placeholder="Paste the text of a deck or product sheet"
-          value={docText}
-          onChange={(e) => setDocText(e.target.value)}
-        />
+        <div className="mt-3 rounded-md border border-dashed border-zinc-300 p-3">
+          <input className={input} placeholder="Name, such as deck.txt" value={pasteName} onChange={(e) => setPasteName(e.target.value)} />
+          <textarea
+            className={`${input} h-24`}
+            placeholder="Or paste the text of a deck, PDF or product sheet"
+            value={pasteText}
+            onChange={(e) => setPasteText(e.target.value)}
+          />
+          <button onClick={addPasted} disabled={!pasteText.trim()} className="mt-2 rounded-md border border-zinc-300 px-3 py-1 text-sm disabled:opacity-50">
+            Add pasted text
+          </button>
+        </div>
+        {documents.length > 0 && (
+          <ul className="mt-3 flex flex-col gap-1 text-sm">
+            {documents.map((doc, i) => (
+              <li key={`${doc.filename}-${i}`} className="flex items-center justify-between rounded-md bg-zinc-50 px-3 py-1.5">
+                <span>
+                  {doc.filename} <span className="text-zinc-500">- {doc.text.length.toLocaleString()} characters</span>
+                </span>
+                <button onClick={() => setDocuments((current) => current.filter((_, j) => j !== i))} className="text-xs text-zinc-600 underline">
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
         <button
-          disabled={busy || !url}
-          onClick={submitCompany}
-          className="mt-4 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          disabled={busy !== "" || !url}
+          onClick={build}
+          className="mt-5 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
-          Build the Brief
+          {busy === "building" ? "Reading the site and writing the Brief..." : state.brief ? "Rebuild the Brief" : "Build the Brief"}
         </button>
+        {state.brief && <p className="mt-2 text-xs text-zinc-500">Rebuilding replaces the Brief and the Voice below and clears the approval.</p>}
       </section>
+
       {state.brief && (
         <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-5">
           <div className="flex items-center justify-between">
@@ -98,36 +166,40 @@ export default function CompanyPage() {
               {state.brief.approved ? "approved" : "not approved"}
             </span>
           </div>
-          <textarea
-            className="mt-3 h-32 w-full rounded-md border border-zinc-300 px-3 py-2"
-            value={briefText}
-            onChange={(e) => setBriefText(e.target.value)}
-          />
-          <label className="mt-4 block text-sm font-medium">Voice: tone</label>
-          <input
-            className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2"
-            value={tone}
-            onChange={(e) => setTone(e.target.value)}
-          />
-          {state.voice && (
-            <p className="mt-2 text-xs text-zinc-500">
-              Rules: {state.voice.rules.join(" ")} Banned words: {state.voice.bannedWords.join(", ")}
-            </p>
-          )}
-          <div className="mt-4 flex gap-3">
+          <p className="mt-1 text-xs text-zinc-500">
+            From {state.company?.url}
+            {state.documents.length > 0 && ` and ${state.documents.map((d) => d.filename).join(", ")}`}
+          </p>
+          <textarea className={`${input} mt-3 h-40`} value={briefText} onChange={(e) => setBriefText(e.target.value)} />
+
+          <h3 className="mt-5 text-sm font-semibold">Voice</h3>
+          <label htmlFor="voice-tone" className="mt-2 block text-sm font-medium">
+            Tone
+          </label>
+          <input id="voice-tone" className={input} value={tone} onChange={(e) => setTone(e.target.value)} />
+          <label htmlFor="voice-rules" className="mt-3 block text-sm font-medium">
+            Rules, one per line
+          </label>
+          <textarea id="voice-rules" className={`${input} h-24`} value={rules} onChange={(e) => setRules(e.target.value)} />
+          <label htmlFor="voice-banned" className="mt-3 block text-sm font-medium">
+            Banned words, comma separated
+          </label>
+          <input id="voice-banned" className={input} value={banned} onChange={(e) => setBanned(e.target.value)} />
+
+          <div className="mt-5 flex gap-3">
             <button
-              disabled={busy}
-              onClick={() => saveBrief(false)}
+              disabled={busy !== ""}
+              onClick={() => saveBrief(state.brief!.approved)}
               className="rounded-md border border-zinc-300 px-4 py-2 text-sm disabled:opacity-50"
             >
               Save
             </button>
             <button
-              disabled={busy}
+              disabled={busy !== ""}
               onClick={() => saveBrief(true)}
               className="rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
             >
-              Approve the Brief
+              {state.brief.approved ? "Save and keep approved" : "Approve the Brief"}
             </button>
           </div>
         </section>
