@@ -29,7 +29,7 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-6xl">
       <PageHeader title="Dashboard" subtitle="Your Runs, your Winners and the hours given back.">
-        <Link href="/ads" className="rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-700">
+        <Link href="/ads" className="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-500">
           New Run
         </Link>
       </PageHeader>

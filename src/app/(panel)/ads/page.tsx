@@ -148,7 +148,7 @@ export default function AdsPage() {
                 disabled={busy || video}
                 onClick={() => toggle(platform)}
                 className={`flex items-center justify-between rounded-xl border px-3 py-2.5 text-left text-sm transition ${
-                  on ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-200 bg-white text-zinc-800 hover:border-zinc-400"
+                  on ? "border-brand-600 bg-brand-600 text-white" : "border-zinc-200 bg-white text-zinc-800 hover:border-zinc-400"
                 } disabled:cursor-not-allowed disabled:border-zinc-200 disabled:bg-zinc-50 disabled:text-zinc-400`}
               >
                 <span className="font-medium">{platformName(platform)}</span>
@@ -167,7 +167,7 @@ export default function AdsPage() {
           <button
             disabled={busy || chosen.length === 0}
             onClick={generate}
-            className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-500 disabled:opacity-50"
           >
             {busy && <Spinner />}
             {busy ? "Generating..." : "Generate Variants"}
@@ -389,7 +389,7 @@ function VariantPanel({
         <button
           onClick={onPick}
           disabled={winner}
-          className="flex-1 rounded-xl border border-zinc-900 px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-900 hover:text-white disabled:border-emerald-600 disabled:bg-emerald-600 disabled:text-white"
+          className="flex-1 rounded-xl border border-brand-600 px-3 py-2 text-sm font-medium text-brand-700 hover:bg-brand-600 hover:text-white disabled:border-emerald-600 disabled:bg-emerald-600 disabled:text-white"
         >
           {winner ? "Winner" : "Pick as Winner"}
         </button>

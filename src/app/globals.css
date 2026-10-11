@@ -1,5 +1,46 @@
 @import "tailwindcss";
 
-body {
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+@theme {
+  --color-brand-50: #f3f1ff;
+  --color-brand-100: #e9e5ff;
+  --color-brand-200: #d4ccff;
+  --color-brand-300: #b3a5ff;
+  --color-brand-400: #8f78fb;
+  --color-brand-500: #7352f4;
+  --color-brand-600: #6236e8;
+  --color-brand-700: #5228c9;
+  --color-brand-800: #4423a3;
+  --color-brand-900: #2a1a66;
+  --color-coral-300: #ffb199;
+  --color-coral-400: #ff8a65;
+  --color-coral-500: #ff6b45;
+  --color-ink: #0c0a1d;
+  --color-canvas: #f7f7f4;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  button:focus-visible,
+  a:focus-visible {
+    outline: 2px solid var(--color-brand-400);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-brand-100);
+  }
 }

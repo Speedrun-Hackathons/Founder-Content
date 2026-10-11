@@ -149,7 +149,7 @@ export default function CompanyPage() {
         <button
           disabled={busy !== "" || !url}
           onClick={build}
-          className="mt-5 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="mt-5 rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
           {busy === "building" ? "Reading the site and writing the Brief..." : state.brief ? "Rebuild the Brief" : "Build the Brief"}
         </button>

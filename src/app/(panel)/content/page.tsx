@@ -121,7 +121,7 @@ export default function ContentPage() {
                 key={platform}
                 type="button"
                 onClick={() => toggle(platform)}
-                className={`rounded-full border px-3 py-1 text-sm ${on ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-300 text-zinc-700"}`}
+                className={`rounded-full border px-3 py-1 text-sm ${on ? "border-brand-600 bg-brand-600 text-white" : "border-zinc-300 text-zinc-700"}`}
                 title={isConnected ? undefined : "Not connected in Social Streamline: drafts work, publishing will be refused."}
               >
                 {LABEL[platform]}
@@ -133,7 +133,7 @@ export default function ContentPage() {
         <button
           onClick={writeCaptions}
           disabled={writing || chosen.length === 0}
-          className="mt-4 rounded-md bg-zinc-900 px-4 py-2 text-sm text-white disabled:opacity-50"
+          className="mt-4 rounded-md bg-brand-600 px-4 py-2 text-sm text-white disabled:opacity-50"
         >
           {writing ? "Writing..." : `Write ${chosen.length} caption${chosen.length === 1 ? "" : "s"}`}
         </button>
@@ -227,7 +227,7 @@ export default function ContentPage() {
                         <button
                           onClick={() => act(post, "publish")}
                           disabled={busy === post.id}
-                          className="rounded-md bg-zinc-900 px-3 py-1 text-xs text-white disabled:opacity-50"
+                          className="rounded-md bg-brand-600 px-3 py-1 text-xs text-white disabled:opacity-50"
                         >
                           Publish now
                         </button>
