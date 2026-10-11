@@ -1,14 +1,25 @@
 import { fail, isResponse, json, readJson } from "@/lib/http";
 import { briefAI, OpenAINotConfigured } from "@/lib/content/ai";
+import { archiveStatus, companyArchive, ensureCompanyLoaded, saveCompany } from "@/lib/content/archive";
 import { privateHostReason, siteReader, type SitePage } from "@/lib/content/site";
 import { createCompany, getState, updateBrief, updateVoice } from "@/lib/store";
 
 const MAX_DOCUMENTS = 10;
 const MAX_DOCUMENT_CHARS = 200_000;
 
-export function GET() {
+/** The Company with its Brief and Voice, where they are kept, and the last saved versions of the Brief. */
+export async function GET() {
+  await ensureCompanyLoaded();
   const state = getState();
-  return json({ company: state.company, documents: state.documents, brief: state.brief, voice: state.voice });
+  let history: unknown[] = [];
+  if (state.company) {
+    try {
+      history = await companyArchive().history(state.company.id, 10);
+    } catch {
+      // archiveStatus() already carries the reason the archive could not be read.
+    }
+  }
+  return json({ company: state.company, documents: state.documents, brief: state.brief, voice: state.voice, archive: archiveStatus(), history });
 }
 
 /** Reads the Company URL and the Documents, then writes a Brief and a Voice for the Founder to edit and approve. */
@@ -61,5 +72,6 @@ export async function POST(req: Request) {
   if (draft.companyName) created.company.name = draft.companyName;
   const brief = updateBrief({ text: draft.brief });
   const voice = updateVoice(draft.voice);
-  return json({ company: created.company, brief, voice }, 201);
+  await saveCompany();
+  return json({ company: created.company, brief, voice, archive: archiveStatus() }, 201);
 }

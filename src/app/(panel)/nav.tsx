@@ -7,9 +7,13 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: "M4 13h6V4H4zM14 20h6v-9h-6zM4 20h6v-3H4zM14 7h6V4h-6z" },
   { href: "/company", label: "Company", icon: "M4 20V8l8-4 8 4v12M9 20v-5h6v5" },
   { href: "/content", label: "Content", icon: "M5 5h14v10H8l-3 3z" },
+  { href: "/calendar", label: "Calendar", icon: "M5 6h14v14H5zM5 10h14M9 4v4M15 4v4" },
+  { href: "/studio", label: "Studio", icon: "M4 6h11v12H4zM15 10l5-3v10l-5-3" },
+  { href: "/library", label: "Library", icon: "M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4" },
   { href: "/ads", label: "Ads", icon: "M5 5h6v14H5zM13 5h6v14h-6z" },
   { href: "/accounts", label: "Accounts", icon: "M16 19v-1a4 4 0 0 0-8 0v1M12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" },
   { href: "/analytics", label: "Analytics", icon: "M5 19V9M12 19V5M19 19v-7" },
+  { href: "/settings", label: "Settings", icon: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4" },
 ] as const;
 
 export function PanelNav({ layout }: { layout: "side" | "top" }) {

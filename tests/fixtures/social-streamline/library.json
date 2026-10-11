@@ -1,0 +1,11 @@
+{
+  "source": "shape recorded 2026-10-11 (GET /library), ids, titles and URLs replaced",
+  "status": 200,
+  "body": {
+    "data": [
+      { "id": "lib-video-1", "title": "facecam-take-2.mp4", "kind": "video", "source": "uploaded", "subtype": null, "url": "https://cdn.example/facecam-take-2.mp4", "posterUrl": "https://cdn.example/facecam-take-2.jpg", "previewUrl": null, "durationSec": 74.2, "aspectRatio": null, "fileSize": 18200000, "regeneratedFromId": null, "createdAt": "2026-10-10T18:00:00.000Z" },
+      { "id": "lib-image-1", "title": "product-shot.jpeg", "kind": "image", "source": "uploaded", "subtype": null, "url": "https://cdn.example/product-shot.jpeg", "posterUrl": null, "previewUrl": null, "durationSec": null, "aspectRatio": null, "fileSize": 4181757, "regeneratedFromId": null, "createdAt": "2026-10-11T00:32:15.032Z" }
+    ],
+    "meta": { "count": 2, "nextCursor": null }
+  }
+}

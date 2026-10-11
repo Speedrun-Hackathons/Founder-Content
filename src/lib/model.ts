@@ -106,6 +106,8 @@ export type Post = {
   /** Added by lane B: where the Post came from, and the text it sends. */
   origin: "variant" | "caption";
   text: string;
+  /** Added by lane B: the public image or video URLs the Post carries. */
+  mediaUrls: string[];
 };
 
 export type RunTime = {

@@ -1,7 +1,9 @@
 import { fail, isResponse, json, readJson } from "@/lib/http";
+import { archiveStatus, ensureCompanyLoaded, saveCompany } from "@/lib/content/archive";
 import { getState, recordEvent, updateBrief, updateVoice } from "@/lib/store";
 
-export function GET() {
+export async function GET() {
+  await ensureCompanyLoaded();
   const state = getState();
   if (!state.brief) return fail("no_brief", "No Brief yet. Add the Company URL first.", 404);
   return json({ brief: state.brief, voice: state.voice });
@@ -10,6 +12,7 @@ export function GET() {
 export async function PUT(req: Request) {
   const body = await readJson(req);
   if (isResponse(body)) return body;
+  await ensureCompanyLoaded();
   const state = getState();
   if (!state.brief) return fail("no_brief", "No Brief yet. Add the Company URL first.", 404);
   if (body.text !== undefined && typeof body.text !== "string") {
@@ -29,5 +32,6 @@ export async function PUT(req: Request) {
     });
   }
   if (brief?.approved && !wasApproved) recordEvent("brief_approved", { briefId: brief.id });
-  return json({ brief, voice: getState().voice });
+  await saveCompany();
+  return json({ brief, voice: getState().voice, archive: archiveStatus() });
 }

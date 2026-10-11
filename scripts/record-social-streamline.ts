@@ -1,7 +1,8 @@
 // Records real Social Streamline responses into tests/fixtures/social-streamline/live/ (gitignored) so the
 // normalizers and the hand-written fixtures can be checked against the real shapes.
 //
-//   node scripts/record-social-streamline.ts            read-only: me, credits, accounts, posts, analytics
+//   node scripts/record-social-streamline.ts            read-only: me, credits, accounts, posts, analytics,
+//                                                      library, media, jobs, presets, posting defaults, webhooks
 //   node scripts/record-social-streamline.ts --write    also a LinkedIn and an X caption (spends credits)
 //                                                      and a draft that is created, read back and deleted
 //
@@ -69,6 +70,14 @@ await record("accounts", "GET", "/accounts");
 await record("posts", "GET", "/posts?limit=5");
 await record("posts-failed", "GET", "/posts?status=failed&limit=3");
 await record("analytics", "GET", "/analytics?days=30");
+await record("library", "GET", "/library?limit=5");
+await record("library-counts", "GET", "/library/counts");
+await record("media", "GET", "/media?limit=5");
+await record("jobs", "GET", "/jobs?limit=5");
+await record("presets", "GET", "/presets");
+await record("caption-presets", "GET", "/caption-presets");
+await record("posting-defaults", "GET", "/posting-defaults");
+await record("webhooks", "GET", "/webhooks");
 
 if (process.argv.includes("--write")) {
   await record("content-generate", "POST", "/content/generate", {

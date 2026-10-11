@@ -2,13 +2,14 @@
 // environment; the browser only ever calls the site's own routes.
 
 import { NextResponse } from "next/server";
-import { fail } from "@/lib/http";
+import { fail, json } from "@/lib/http";
 import type { Post, PostStatus } from "@/lib/model";
 import { markRunPublished, recordEvent } from "@/lib/store";
 import { createSocialStreamline, SocialStreamlineError, type ProviderPost, type SocialStreamline } from "./client";
 
 export { SocialStreamlineError } from "./client";
-export type { Caption, ProviderAccount, ProviderPost, SocialStreamline } from "./client";
+export { TERMINAL_JOB_STATUSES } from "./client";
+export type { Caption, Job, LibraryItem, Preset, ProviderAccount, ProviderPost, SocialStreamline, Webhook } from "./client";
 
 let testClient: SocialStreamline | null = null;
 
@@ -20,6 +21,15 @@ export function setSocialStreamline(client: SocialStreamline): void {
 /** Goes back to the client built from the environment. */
 export function resetSocialStreamline(): void {
   testClient = null;
+}
+
+/** Runs one posting-service call for a route: its result as JSON, or the service's own failure. */
+export async function respond<T>(work: (client: SocialStreamline) => Promise<T>, status = 200): Promise<NextResponse> {
+  try {
+    return json(await work(socialStreamline()), status);
+  } catch (err) {
+    return serviceFailure(err);
+  }
 }
 
 export function socialStreamline(): SocialStreamline {
