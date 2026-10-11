@@ -6,6 +6,7 @@ import type { Platform } from "@/lib/model";
 import { fromApiPlatform, toApiPlatform } from "./platforms";
 
 export const DEFAULT_BASE_URL = "https://socialstreamline.me/api/v1";
+const REQUEST_TIMEOUT_MS = 30_000;
 
 export type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
 
@@ -63,6 +64,7 @@ export function createSocialStreamline(config: { apiKey: string; baseUrl?: strin
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
       cache: "no-store",
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
     const text = await response.text();
     let json: unknown = undefined;

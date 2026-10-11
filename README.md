@@ -24,7 +24,6 @@ Open http://localhost:3000. Every panel page needs a signed-in session; without 
 | DEMO_EMAIL, DEMO_PASSWORD | the one sign-in account; email and password, compared on the server |
 | AUTH_URL | the public base URL of the deployment |
 | OPENAI_API_KEY | Brief, Voice, ad text, images |
-| KEEWANO_API_KEY | not used yet: sending events to Keewano is parked, and events stay in the store |
 | SOCIAL_STREAMLINE_API_KEY, SOCIAL_STREAMLINE_MCP_URL | captions, drafts, scheduling, publishing, accounts, analytics |
 
 Keys are passed between teammates directly, never through the repository.
@@ -69,7 +68,7 @@ The key arrives by direct message from the lead and is revoked on 2026-10-13; af
 
 ## Limits of this build
 
-- The API routes carry no session check; the panel pages do. Anyone with the URL can call a route, so the deployment stays private until a route guard lands.
+- Every API route except health, sign-in and media answers 401 without a session; the media route stays public because the posting service fetches images from it.
 - The store is one in-process object shared by every signed-in user and reset on every restart; the live services replace it lane by lane.
 - One shared sign-in account from the environment; no user table yet.
 

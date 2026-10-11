@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import {
   type Account,
   type Ad,
@@ -30,9 +31,11 @@ const FOUNDER_ID = "founder_demo";
 
 let counter = 0;
 
+const BOOT = Date.now().toString(36).slice(-4) + randomBytes(2).toString("hex");
+
 export function newId(prefix: string): string {
   counter += 1;
-  return `${prefix}_${counter.toString(36).padStart(4, "0")}`;
+  return `${prefix}_${BOOT}_${counter.toString(36).padStart(4, "0")}`;
 }
 
 export function now(): string {

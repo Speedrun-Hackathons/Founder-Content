@@ -34,7 +34,7 @@ RAILWAY_URL="${RAILWAY_URL%/}"
 
 echo "Step 3 of 3: Railway variables"
 echo "  In the Railway service, Variables tab, add these with the values from $ENV_FILE, and AUTH_URL set to the Railway URL:"
-for key in AUTH_SECRET AUTH_URL DEMO_EMAIL DEMO_PASSWORD OPENAI_API_KEY KEEWANO_API_KEY SOCIAL_STREAMLINE_API_KEY SOCIAL_STREAMLINE_MCP_URL; do
+for key in AUTH_SECRET AUTH_URL DEMO_EMAIL DEMO_PASSWORD OPENAI_API_KEY SOCIAL_STREAMLINE_API_KEY SOCIAL_STREAMLINE_MCP_URL; do
   echo "    $key"
 done
 if [ -n "$RAILWAY_URL" ]; then

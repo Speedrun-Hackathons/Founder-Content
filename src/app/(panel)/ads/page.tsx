@@ -82,21 +82,24 @@ export default function AdsPage() {
     setBusy(true);
     setError("");
     setNotice("");
-    try {
-      const r = await api<{ run: Run; ads: Ad[]; failures: { platform: Platform; error: string }[] }>("/api/runs", {
-        method: "POST",
-        body: JSON.stringify({ platforms: chosen }),
-      });
-      setNotice(
-        `Run ${r.run.id} made ${r.ads.length} Ad${r.ads.length === 1 ? "" : "s"}` +
-          (r.failures.length > 0 ? `. ${r.failures.length} Platform${r.failures.length === 1 ? "" : "s"} failed, see the reason below.` : "."),
-      );
-      await load();
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
+    const results = await Promise.allSettled(
+      chosen.map((platform) =>
+        api<{ run: Run; ads: Ad[]; failures: { platform: Platform; error: string }[] }>("/api/runs", {
+          method: "POST",
+          body: JSON.stringify({ platforms: [platform] }),
+        }),
+      ),
+    );
+    const made = results.reduce((sum, r) => sum + (r.status === "fulfilled" ? r.value.ads.length : 0), 0);
+    const refused = results.flatMap((r, i) => (r.status === "rejected" ? [`${platformName(chosen[i])}: ${(r.reason as Error).message}`] : []));
+    const failed = results.reduce((sum, r) => sum + (r.status === "fulfilled" ? r.value.failures.length : 0), 0) + refused.length;
+    setNotice(
+      `${made} Ad${made === 1 ? "" : "s"} made across ${chosen.length} Platform${chosen.length === 1 ? "" : "s"}` +
+        (failed > 0 ? `. ${failed} failed, see the reason below.` : "."),
+    );
+    if (refused.length > 0) setError(refused.join(" "));
+    await load();
+    setBusy(false);
   }
 
   async function pick(ad: Ad, variant: Variant) {

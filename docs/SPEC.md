@@ -45,7 +45,7 @@ One site. The Founder signs in with an email and password, pastes the Company UR
 - Posts are created as drafts, then scheduled or published; the site never calls a social platform directly.
 - Video renders are queued as jobs and polled until a terminal status; the panel shows queued, running, needs action, succeeded, failed.
 - Accounts are read from the posting service; connecting a new one happens in the posting service's own site, linked from the Accounts page.
-- Keewano receives five events: brief_approved, run_started, variant_generated, winner_picked, post_published.
+- Five events (brief_approved, run_started, variant_generated, winner_picked, post_published) are recorded in the store and readable at the events route; no outside analytics sink.
 - Ad analytics are stand-in numbers until an ads analytics source exists; the panel labels them as such.
 - One data model holds Founder, Company, Document, Brief, Voice, Run, Ad, Variant, Post, Winner, Run time, Time saved, as defined in CONTEXT.md.
 - Three lanes own separate folders: the shell and hosting; content generation and posting; Ads and testing. The data model and the route list are agreed before the lanes start.

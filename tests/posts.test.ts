@@ -174,6 +174,23 @@ describe("retry and refresh", () => {
     expect((await postRetry(new Request("http://test"), params(created.id))).status).toBe(409);
   });
 
+  it("marks a Post the service holds for review as failed with the reason", async () => {
+    const { post: created } = await draft();
+    fake.answer("POST /posts/:id/publish", (call) => {
+      const id = call.path.split("/")[2];
+      return { status: 200, body: { ...fake.posts.get(id), status: "needs_review" } };
+    });
+    await postPublish(new Request("http://test"), params(created.id));
+    const post = getState().posts[0];
+    expect(post.status).toBe("failed");
+    expect(post.error).toContain("needs_review");
+  });
+
+  it("gives ids a boot prefix so idempotency keys differ across restarts", async () => {
+    const { post: created } = await draft();
+    expect(created.id).toMatch(/^post_[0-9a-z]{8}_[0-9a-z]{4}$/);
+  });
+
   it("re-reads a Post still on its way out when the list loads", async () => {
     const { post: created } = await draft();
     fake.answer("POST /posts/:id/publish", (call) => {
