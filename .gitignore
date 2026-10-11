@@ -1,5 +1,12 @@
+/node_modules
+/.next/
+/out/
+/coverage
 .env
-.venv/
-node_modules/
-__pycache__/
+.env.local
+.env.*.local
+!.env.example
+*.tsbuildinfo
+next-env.d.ts
 .DS_Store
+npm-debug.log*
