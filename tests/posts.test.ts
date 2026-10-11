@@ -10,7 +10,7 @@ import { GET as getEvents } from "@/app/api/events/route";
 import { installFakeAds, resetAds } from "@/lib/ads/testing";
 import { setSocialStreamlineForTests } from "@/lib/social";
 import { getState, resetStore } from "@/lib/store";
-import { fakeSocialStreamline, fixture } from "./fakes/social-streamline";
+import { FAKE_API_KEY, fakeSocialStreamline, fixture } from "./fakes/social-streamline";
 
 function post(path: string, body: unknown = {}): Request {
   return new Request(`http://test${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -60,7 +60,7 @@ describe("drafts from a Variant", () => {
     const sent = fake.calls.find((c) => c.method === "POST" && c.path === "/posts")!;
     expect(sent.body).toEqual({ content: variant.text, platforms: ["twitter"], mediaUrls: variant.mediaUrls });
     expect(sent.headers["Idempotency-Key"]).toBe(`draft:${variant.id}`);
-    expect(sent.headers.Authorization).toBe("Bearer ss_test_fake");
+    expect(sent.headers.Authorization).toBe(`Bearer ${FAKE_API_KEY}`);
   });
 
   it("returns the existing draft instead of making a second one", async () => {
@@ -149,7 +149,7 @@ describe("publish", () => {
     const text = await res.text();
     expect(res.status).toBe(502);
     expect(text).toContain("Invalid or missing API key");
-    expect(text).not.toContain("ss_test_fake");
+    expect(text).not.toContain(FAKE_API_KEY);
   });
 });
 

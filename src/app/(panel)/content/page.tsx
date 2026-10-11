@@ -125,7 +125,7 @@ export default function ContentPage() {
                 title={isConnected ? undefined : "Not connected in Social Streamline: drafts work, publishing will be refused."}
               >
                 {LABEL[platform]}
-                {!isConnected && <span className={`ml-1 text-xs ${on ? "text-zinc-300" : "text-zinc-400"}`}>· not connected</span>}
+                {!isConnected && <span className={`ml-1 text-xs ${on ? "text-zinc-300" : "text-zinc-400"}`}>- not connected</span>}
               </button>
             );
           })}
@@ -135,7 +135,7 @@ export default function ContentPage() {
           disabled={writing || chosen.length === 0}
           className="mt-4 rounded-md bg-zinc-900 px-4 py-2 text-sm text-white disabled:opacity-50"
         >
-          {writing ? "Writing…" : `Write ${chosen.length} caption${chosen.length === 1 ? "" : "s"}`}
+          {writing ? "Writing..." : `Write ${chosen.length} caption${chosen.length === 1 ? "" : "s"}`}
         </button>
 
         {results.length > 0 && (
@@ -200,8 +200,8 @@ export default function ContentPage() {
                     <p className="line-clamp-2 text-sm text-zinc-900">{post.text || <span className="text-zinc-400">(no text)</span>}</p>
                     <p className="mt-1 text-xs text-zinc-500">
                       {LABEL[post.platform]}
-                      {post.variantId ? " · from an Ad Variant" : " · caption"}
-                      {post.scheduledFor && ` · ${post.status === "scheduled" ? "sends" : "sent"} ${new Date(post.scheduledFor).toLocaleString()}`}
+                      {post.variantId ? " - from an Ad Variant" : " - caption"}
+                      {post.scheduledFor && ` - ${post.status === "scheduled" ? "sends" : "sent"} ${new Date(post.scheduledFor).toLocaleString()}`}
                     </p>
                     {post.error && <p className="mt-2 text-sm text-amber-700">{post.error}</p>}
                   </div>

@@ -9,6 +9,8 @@ export type Recording = { status: number; headers?: Record<string, string>; body
 export type Call = { method: string; path: string; headers: Record<string, string>; body: Record<string, unknown> };
 type Answer = Recording | ((call: Call) => Recording);
 
+export const FAKE_API_KEY = "fake-test-key";
+
 export function fixture(name: string): Recording {
   return JSON.parse(readFileSync(new URL(`../fixtures/social-streamline/${name}.json`, import.meta.url), "utf8"));
 }
@@ -98,7 +100,7 @@ export function fakeSocialStreamline() {
   }
 
   return {
-    client: createSocialStreamline({ apiKey: "ss_test_fake", baseUrl: "https://fake.socialstreamline.test/api/v1", fetch: fakeFetch }),
+    client: createSocialStreamline({ apiKey: FAKE_API_KEY, baseUrl: "https://fake.socialstreamline.test/api/v1", fetch: fakeFetch }),
     calls,
     posts,
     /** Replaces one call, e.g. answer("POST /posts/:id/publish", fixture("error-platform-constraint")). */
