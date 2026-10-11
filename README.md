@@ -58,6 +58,15 @@ Every route answers JSON; an error is `{ "error": code, "message": text }` with 
 
 Railway reads `railway.json`: Nixpacks build, `npm run start`, health check on `/api/health`. Set the variables above in the Railway service; the app listens on the port Railway provides.
 
+## Posting service MCP
+
+To use the posting service's tools from a coding agent, put the key in `.env` as SOCIAL_STREAMLINE_API_KEY and run, from Git Bash in the repository:
+
+    set -a; . ./.env; set +a
+    claude mcp add --transport http social-streamline https://socialstreamline.me/mcp --header "Authorization: Bearer $SOCIAL_STREAMLINE_API_KEY"
+
+The key arrives by direct message from the lead and is revoked on 2026-10-13; after that date the command needs a new key.
+
 ## Limits of this build
 
 - The API routes carry no session check; the panel pages do. Anyone with the URL can call a route, so the deployment stays private until a route guard lands.
