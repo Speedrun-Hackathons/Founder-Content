@@ -42,11 +42,13 @@ export default function CompanyPage() {
     }
   }
 
-  async function saveBrief(approved: boolean) {
+  async function saveBrief(approve: boolean) {
     setBusy(true);
     setError("");
     try {
-      await api("/api/brief", { method: "PUT", body: JSON.stringify({ text: briefText, approved, voice: { tone } }) });
+      const patch: Record<string, unknown> = { text: briefText, voice: { tone } };
+      if (approve) patch.approved = true;
+      await api("/api/brief", { method: "PUT", body: JSON.stringify(patch) });
       load();
     } catch (e) {
       setError((e as Error).message);

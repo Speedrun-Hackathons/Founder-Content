@@ -68,7 +68,7 @@ The key arrives by direct message from the lead and is revoked on 2026-10-13; af
 
 ## Limits of this build
 
-- The API routes carry no session check; the panel pages do. Anyone with the URL can call a route, so the deployment stays private until a route guard lands.
+- Every API route except health, sign-in and media answers 401 without a session; the media route stays public because the posting service fetches images from it.
 - The store is one in-process object shared by every signed-in user and reset on every restart; the live services replace it lane by lane.
 - One shared sign-in account from the environment; no user table yet.
 

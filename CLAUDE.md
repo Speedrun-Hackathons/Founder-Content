@@ -72,6 +72,6 @@ Use GitHub issues through `gh`. `docs/agents/issue-tracker.md` has the conventio
 
 ## Known limits
 
-- API routes have no session check.
+- Every API route except health, sign-in and media answers 401 without a session.
 - The store is shared by every user and lost on restart.
 - Media in the default `MEDIA_DIR` is lost on redeploy. Before the demo, point it at a Railway volume.
