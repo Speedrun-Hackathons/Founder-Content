@@ -56,7 +56,7 @@ Every route answers JSON; an error is `{ "error": code, "message": text }` with 
 
 ## Deploy
 
-Railway reads `railway.json`: Nixpacks build, `npm run start`, health check on `/api/health`. Set the variables above in the Railway service; the app listens on the port Railway provides.
+Railway reads `railway.json`: Nixpacks build, `npm run start`, health check on `/api/health`. Set the variables above in the Railway service; the app listens on the port Railway provides. The public address is https://socialcofounder.com, so AUTH_URL and PUBLIC_BASE_URL are both `https://socialcofounder.com` in the Railway variables, and media links and sign-in redirects use that host.
 
 ## Posting service MCP
 
