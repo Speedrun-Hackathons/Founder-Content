@@ -167,7 +167,7 @@ export default function AdsPage() {
             className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
           >
             {busy && <Spinner />}
-            {busy ? "Generating…" : "Generate Variants"}
+            {busy ? "Generating..." : "Generate Variants"}
           </button>
         </div>
       </Card>
@@ -378,9 +378,9 @@ function VariantPanel({
         {variant.text.length} / {maxChars} characters
       </div>
       <dl className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-zinc-50 p-3 text-center">
-        <Metric label="Impressions" value={stat ? compact(stat.impressions) : "–"} />
-        <Metric label="Clicks" value={stat ? compact(stat.clicks) : "–"} />
-        <Metric label="Click rate" value={stat ? percent(stat.clickRate) : "–"} />
+        <Metric label="Impressions" value={stat ? compact(stat.impressions) : "-"} />
+        <Metric label="Clicks" value={stat ? compact(stat.clicks) : "-"} />
+        <Metric label="Click rate" value={stat ? percent(stat.clickRate) : "-"} />
       </dl>
       <div className="mt-4 flex gap-2 pt-1">
         <button
