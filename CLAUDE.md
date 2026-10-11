@@ -52,7 +52,7 @@ A ticket counts as done when `npm test`, `npm run lint` and `npm run build` are 
   - A Platform that fails gives `{ platform, error }` and creates no Ad.
   - TikTok and YouTube fail at once, because the posting service accepts only video for them.
 - **Media** is written to `MEDIA_DIR` (default: an OS temp dir) and served by `/api/ads/media/[file]`. Public links use `PUBLIC_BASE_URL`, falling back to `AUTH_URL`. The posting service accepts media only by public https URL.
-- **Events:** the five event types are recorded in the store with `recordEvent` and read back through `/api/events`. Sending them to Keewano is parked; issue #14 says how to restore it.
+- **Events:** the five event types are recorded in the store with `recordEvent` and read back through `/api/events`. No outside event sink; the team dropped that integration.
 - **Posting service:** Social Streamline over MCP, JSON-RPC over HTTPS with SSE responses; `docs/HANDOFF-LANE-B.md` has the protocol. The site never calls a social platform directly. Posts go draft, then schedule or publish.
 
 ## Tests

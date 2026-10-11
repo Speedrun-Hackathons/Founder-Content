@@ -50,19 +50,22 @@ export function serviceFailure(err: unknown): NextResponse {
 export function applyProviderPost(post: Post, provider: ProviderPost): PostStatus {
   const outcome = provider.platforms.find((o) => o.platform === post.platform);
   const failed = provider.status === "failed" || outcome?.status === "failed";
+  const held = !failed && toPostStatus(provider.status) === null;
   post.providerPostId = provider.id;
   post.scheduledFor = provider.scheduledFor;
-  post.status = failed ? "failed" : toPostStatus(provider.status);
+  post.status = failed || held ? "failed" : (toPostStatus(provider.status) as PostStatus);
   post.error = failed
     ? (provider.errorMessage ?? ([outcome?.error, outcome?.nextStep].filter(Boolean).join(" ") || "The platform refused this post."))
-    : null;
+    : held
+      ? `The posting service holds this post with status "${provider.status}"; open it there to continue.`
+      : null;
   return post.status;
 }
 
-function toPostStatus(status: string): PostStatus {
+function toPostStatus(status: string): PostStatus | null {
   if (status === "draft" || status === "scheduled" || status === "published") return status;
-  // processing and needs_review are on their way out; GET /api/posts refreshes them.
-  return "scheduled";
+  if (status === "processing") return "scheduled";
+  return null;
 }
 
 export function isSending(post: Post): boolean {

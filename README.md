@@ -24,7 +24,6 @@ Open http://localhost:3000. Every panel page needs a signed-in session; without 
 | DEMO_EMAIL, DEMO_PASSWORD | the one sign-in account; email and password, compared on the server |
 | AUTH_URL | the public base URL of the deployment |
 | OPENAI_API_KEY | Brief, Voice, ad text, images |
-| KEEWANO_API_KEY | not used yet: sending events to Keewano is parked, and events stay in the store |
 | SOCIAL_STREAMLINE_API_KEY, SOCIAL_STREAMLINE_MCP_URL | captions, drafts, scheduling, publishing, accounts, analytics |
 
 Keys are passed between teammates directly, never through the repository.
