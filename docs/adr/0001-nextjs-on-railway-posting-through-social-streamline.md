@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-The product needs a web app with Google sign-in, server-side calls to an image model and to a posting service, and one deploy that a three-person team can ship in a day. Social Streamline writes captions, renders video from uploaded clips and publishes to nine platforms over MCP, but it hosts nothing and makes no images, so the site needs its own stack and its own image model. The alternatives were a Python API plus a static front end (two deploys, sign-in built by hand) or Next.js (one deploy, API routes in the same app).
+The product needs a web app with email and password sign-in, server-side calls to an image model and to a posting service, and one deploy that a three-person team can ship in a day. Social Streamline writes captions, renders video from uploaded clips and publishes to nine platforms over MCP, but it hosts nothing and makes no images, so the site needs its own stack and its own image model. The alternatives were a Python API plus a static front end (two deploys, sign-in built by hand) or Next.js (one deploy, API routes in the same app).
 
 ## Decision
 

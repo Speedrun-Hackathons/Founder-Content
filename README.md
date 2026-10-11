@@ -12,7 +12,7 @@ Documents: [CONTEXT.md](CONTEXT.md) (the glossary), [docs/SPEC.md](docs/SPEC.md)
     cp .env.example .env
     npm run dev
 
-Open http://localhost:3000. Every panel page needs a signed-in session; without Google credentials in `.env` the sign-in page says so and stops there.
+Open http://localhost:3000. Every panel page needs a signed-in session; without DEMO_EMAIL and DEMO_PASSWORD in `.env` the sign-in page says so and stops there.
 
 ## Configure
 
@@ -21,7 +21,7 @@ Open http://localhost:3000. Every panel page needs a signed-in session; without 
 | Variable | Needed for |
 |---|---|
 | AUTH_SECRET | session signing; any random 32-byte string |
-| AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET | Google sign-in (an OAuth client from the Google Cloud console, redirect URI `BASE_URL/api/auth/callback/google`) |
+| DEMO_EMAIL, DEMO_PASSWORD | the one sign-in account; email and password, compared on the server |
 | AUTH_URL | the public base URL of the deployment |
 | OPENAI_API_KEY | Brief, Voice, ad text, images |
 | KEEWANO_API_KEY | the event stream; empty means events stay local and `/api/events` reports `off (no KEEWANO_API_KEY)` |
@@ -71,8 +71,8 @@ The key arrives by direct message from the lead and is revoked on 2026-10-13; af
 
 - The API routes carry no session check; the panel pages do. Anyone with the URL can call a route, so the deployment stays private until a route guard lands.
 - The store is one in-process object shared by every signed-in user and reset on every restart; the live services replace it lane by lane.
-- Any Google account can sign in; there is no allowlist.
+- One shared sign-in account from the environment; no user table yet.
 
 ## Not in the repository
 
-Keys and secrets (`.env`), the OAuth client, the Railway project, the posting-service workspace and its connected accounts.
+Keys and secrets (`.env`), the Railway project, the posting-service workspace and its connected accounts.
