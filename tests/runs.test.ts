@@ -10,6 +10,7 @@ import { GET as getEvents } from "@/app/api/events/route";
 import { resetAdsAI } from "@/lib/ads/ai";
 import { resetImageStore } from "@/lib/ads/media";
 import { type FakeAdsAI, installFakeAds, resetAds } from "@/lib/ads/testing";
+import { installFakeContent, resetContent } from "@/lib/content/testing";
 import { getState, resetStore } from "@/lib/store";
 
 type Body = {
@@ -60,10 +61,12 @@ let ai: FakeAdsAI;
 
 beforeEach(() => {
   resetStore();
+  installFakeContent();
   ai = installFakeAds().ai;
 });
 
 afterEach(() => {
+  resetContent();
   resetAds();
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();

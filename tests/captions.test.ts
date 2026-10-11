@@ -4,6 +4,7 @@ import { PUT as putBrief } from "@/app/api/brief/route";
 import { POST as postCaptions } from "@/app/api/posts/captions/route";
 import { GET as getPosts } from "@/app/api/posts/route";
 import { resetSocialStreamline, setSocialStreamline } from "@/lib/social";
+import { installFakeContent, resetContent } from "@/lib/content/testing";
 import { getState, resetStore } from "@/lib/store";
 import { fakeSocialStreamline, fixture } from "./fakes/social-streamline";
 
@@ -20,11 +21,15 @@ let fake: ReturnType<typeof fakeSocialStreamline>;
 
 beforeEach(() => {
   resetStore();
+  installFakeContent();
   fake = fakeSocialStreamline();
   setSocialStreamline(fake.client);
 });
 
-afterEach(() => resetSocialStreamline());
+afterEach(() => {
+  resetSocialStreamline();
+  resetContent();
+});
 
 describe("captions and drafts per Platform", () => {
   it("writes one caption per Platform and makes a draft for each", async () => {
