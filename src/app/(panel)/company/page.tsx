@@ -136,7 +136,7 @@ export default function CompanyPage() {
             {documents.map((doc, i) => (
               <li key={`${doc.filename}-${i}`} className="flex items-center justify-between rounded-md bg-zinc-50 px-3 py-1.5">
                 <span>
-                  {doc.filename} <span className="text-zinc-500">· {doc.text.length.toLocaleString()} characters</span>
+                  {doc.filename} <span className="text-zinc-500">- {doc.text.length.toLocaleString()} characters</span>
                 </span>
                 <button onClick={() => setDocuments((current) => current.filter((_, j) => j !== i))} className="text-xs text-zinc-600 underline">
                   Remove
@@ -151,7 +151,7 @@ export default function CompanyPage() {
           onClick={build}
           className="mt-5 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
-          {busy === "building" ? "Reading the site and writing the Brief…" : state.brief ? "Rebuild the Brief" : "Build the Brief"}
+          {busy === "building" ? "Reading the site and writing the Brief..." : state.brief ? "Rebuild the Brief" : "Build the Brief"}
         </button>
         {state.brief && <p className="mt-2 text-xs text-zinc-500">Rebuilding replaces the Brief and the Voice below and clears the approval.</p>}
       </section>

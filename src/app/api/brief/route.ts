@@ -1,6 +1,5 @@
 import { fail, isResponse, json, readJson } from "@/lib/http";
-import { track } from "@/lib/analytics/events";
-import { getState, updateBrief, updateVoice } from "@/lib/store";
+import { getState, recordEvent, updateBrief, updateVoice } from "@/lib/store";
 
 export function GET() {
   const state = getState();
@@ -29,6 +28,6 @@ export async function PUT(req: Request) {
       bannedWords: Array.isArray(voice.bannedWords) ? voice.bannedWords.map(String) : undefined,
     });
   }
-  if (brief?.approved && !wasApproved) await track("brief_approved", { briefId: brief.id });
+  if (brief?.approved && !wasApproved) recordEvent("brief_approved", { briefId: brief.id });
   return json({ brief, voice: getState().voice });
 }

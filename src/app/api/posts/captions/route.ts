@@ -5,8 +5,7 @@ import { fail, isResponse, json, readJson } from "@/lib/http";
 import { isPlatform, PLATFORMS, type Platform, type Post, type Run } from "@/lib/model";
 import { applyProviderPost, serviceFailure, socialStreamline } from "@/lib/social";
 import { captionTranscript } from "@/lib/social/transcript";
-import { track } from "@/lib/analytics/events";
-import { getState, newId, now } from "@/lib/store";
+import { getState, newId, now, recordEvent } from "@/lib/store";
 
 type Result = { platform: Platform; ok: true; post: Post } | { platform: Platform; ok: false; error: string };
 
@@ -37,7 +36,7 @@ export async function POST(req: Request) {
 
   const run: Run = { id: newId("run"), briefId: state.brief.id, platforms, startedAt: now(), publishedAt: null, runTimeSeconds: null };
   state.runs.push(run);
-  await track("run_started", { runId: run.id, platforms });
+  recordEvent("run_started", { runId: run.id, platforms });
 
   let captions;
   try {

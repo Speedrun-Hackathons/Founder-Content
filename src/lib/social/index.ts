@@ -4,8 +4,7 @@
 import { NextResponse } from "next/server";
 import { fail } from "@/lib/http";
 import type { Post, PostStatus } from "@/lib/model";
-import { track } from "@/lib/analytics/events";
-import { markRunPublished } from "@/lib/store";
+import { markRunPublished, recordEvent } from "@/lib/store";
 import { createSocialStreamline, SocialStreamlineError, type ProviderPost, type SocialStreamline } from "./client";
 
 export { SocialStreamlineError } from "./client";
@@ -79,5 +78,5 @@ export function isSending(post: Post): boolean {
 export async function recordIfPublished(post: Post, before: PostStatus): Promise<void> {
   if (post.status !== "published" || before === "published") return;
   markRunPublished(post.runId);
-  await track("post_published", { postId: post.id, platform: post.platform });
+  recordEvent("post_published", { postId: post.id, platform: post.platform });
 }
