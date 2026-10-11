@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 npm install --legacy-peer-deps   # the flag is required
-npm run dev                      # http://localhost:3000; panel pages need Google sign-in
+npm run dev                      # http://localhost:3000; panel pages need DEMO_EMAIL and DEMO_PASSWORD in .env
 npm test                         # vitest, all route tests, no network
 npx vitest run tests/runs.test.ts            # one file
 npx vitest run tests/ads.test.ts -t "Winner" # one test by name

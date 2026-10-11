@@ -6,11 +6,11 @@ A Founder running a company alone or with a small team spends one to three hours
 
 ## Solution
 
-One site. The Founder signs in with Google, pastes the Company URL and uploads Documents, approves a Brief and a Voice, and from then on generates text posts, images, carousels, short and long videos and Ads in two Variants per Platform, schedules or publishes them through the posting service, picks the Winner of each A and B pair, and reads analytics for posts and Ads in one panel. The site stamps the Run time of every Run so the hours given back are measured, not claimed.
+One site. The Founder signs in with an email and password, pastes the Company URL and uploads Documents, approves a Brief and a Voice, and from then on generates text posts, images, carousels, short and long videos and Ads in two Variants per Platform, schedules or publishes them through the posting service, picks the Winner of each A and B pair, and reads analytics for posts and Ads in one panel. The site stamps the Run time of every Run so the hours given back are measured, not claimed.
 
 ## User Stories
 
-1. As a Founder, I want to sign in with Google, so that I reach my panel without a new password.
+1. As a Founder, I want to sign in with an email and password, so that only the team reaches the panel.
 2. As a Founder, I want a left-side navigation with Dashboard, Company, Content, Ads, Accounts and Analytics, so that every function is one click away.
 3. As a Founder, I want to paste my Company URL, so that the site reads my product without me retyping it.
 4. As a Founder, I want to upload Documents, so that the Brief rests on more than the home page.
@@ -38,7 +38,7 @@ One site. The Founder signs in with Google, pastes the Company URL and uploads D
 
 ## Implementation Decisions
 
-- Next.js on Railway, one deploy, Google sign-in. Recorded in ADR 0001.
+- Next.js on Railway, one deploy, email and password sign-in. Recorded in ADR 0001.
 - Every call to OpenAI and to the posting service runs in a server route; the browser calls only the site's own routes.
 - Text generation for posts goes through the posting service's caption tool in the saved Voice; Ads text and all images go through OpenAI.
 - Images are stored by the site at a public https path, since the posting service accepts media only by URL.

@@ -49,7 +49,7 @@ export default function DashboardPage() {
         <div className="rounded-xl bg-zinc-50 p-5">
           <div className="text-sm text-zinc-500">By hand, from the survey</div>
           <div className="mt-1 text-3xl font-semibold tabular-nums">
-            {timeSaved ? `${timeSaved.surveyHoursPerWeekLow} to ${timeSaved.surveyHoursPerWeekHigh}` : "–"}
+            {timeSaved ? `${timeSaved.surveyHoursPerWeekLow} to ${timeSaved.surveyHoursPerWeekHigh}` : "-"}
             <span className="ml-2 text-base font-medium text-zinc-500">hours a week</span>
           </div>
           {timeSaved && <p className="mt-2 text-xs text-zinc-500">{timeSaved.surveySource}</p>}
