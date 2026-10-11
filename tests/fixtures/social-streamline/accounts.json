@@ -1,0 +1,15 @@
+{
+  "source": "shape recorded 2026-10-11 (GET /accounts), ids and handles replaced",
+  "status": 200,
+  "body": {
+    "data": [
+      { "id": "acct-tiktok", "platform": "tiktok_business", "accountName": "demo_founder", "accountHandle": "@demo_founder", "profileImageUrl": null, "connected": true, "disabled": false, "connectedAt": "2026-09-11T02:57:47.606Z" },
+      { "id": "acct-instagram", "platform": "instagram", "accountName": "demo_founder", "accountHandle": "@demo_founder", "profileImageUrl": null, "connected": true, "disabled": false, "connectedAt": "2026-09-11T02:57:47.606Z" },
+      { "id": "acct-facebook", "platform": "facebook", "accountName": "Demo Company", "accountHandle": "@Demo Company", "profileImageUrl": null, "connected": true, "disabled": false, "connectedAt": "2026-09-11T02:57:47.606Z" },
+      { "id": "acct-twitter", "platform": "twitter", "accountName": "demo_founder", "accountHandle": "@demo_founder", "profileImageUrl": null, "connected": true, "disabled": false, "connectedAt": "2026-09-11T02:57:47.606Z" },
+      { "id": "acct-linkedin", "platform": "linkedin", "accountName": "Demo Founder", "accountHandle": "", "profileImageUrl": null, "connected": true, "disabled": false, "connectedAt": "2026-09-11T02:57:47.606Z" },
+      { "id": "acct-pinterest", "platform": "pinterest", "accountName": "demo5800", "accountHandle": "@demo5800", "profileImageUrl": null, "connected": true, "disabled": true, "connectedAt": "2026-09-11T02:57:47.606Z" }
+    ],
+    "meta": { "count": 6, "nextCursor": null }
+  }
+}

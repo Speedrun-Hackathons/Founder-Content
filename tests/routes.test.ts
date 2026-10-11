@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { GET as health } from "@/app/api/health/route";
 import { GET as getCompany, POST as postCompany } from "@/app/api/company/route";
 import { GET as getBrief, PUT as putBrief } from "@/app/api/brief/route";
@@ -11,7 +11,9 @@ import { POST as postPublish } from "@/app/api/posts/[id]/publish/route";
 import { GET as getAccounts } from "@/app/api/accounts/route";
 import { GET as getAnalytics } from "@/app/api/analytics/route";
 import { GET as getEvents, POST as postEvents } from "@/app/api/events/route";
+import { setSocialStreamlineForTests } from "@/lib/social";
 import { resetStore } from "@/lib/store";
+import { fakeSocialStreamline } from "./fakes/social-streamline";
 
 function post(path: string, body: unknown): Request {
   return new Request(`http://test${path}`, {
@@ -38,7 +40,12 @@ async function approvedBrief() {
   await putBrief(put("/api/brief", { approved: true }));
 }
 
-beforeEach(() => resetStore());
+beforeEach(() => {
+  resetStore();
+  setSocialStreamlineForTests(fakeSocialStreamline().client);
+});
+
+afterEach(() => setSocialStreamlineForTests(null));
 
 describe("health", () => {
   it("answers ok with a build id", async () => {

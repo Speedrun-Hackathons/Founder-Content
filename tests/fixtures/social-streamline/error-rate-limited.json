@@ -1,0 +1,6 @@
+{
+  "source": "envelope recorded 2026-10-11; code, message and header assumed",
+  "status": 429,
+  "headers": { "Retry-After": "30" },
+  "body": { "error": { "code": "rate_limited", "message": "Too many requests. Retry after 30 seconds." } }
+}

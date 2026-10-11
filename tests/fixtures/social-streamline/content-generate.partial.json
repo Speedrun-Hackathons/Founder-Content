@@ -1,0 +1,14 @@
+{
+  "source": "linkedin entry recorded 2026-10-11 (POST /content/generate); the twitter error entry is assumed from the spec",
+  "status": 200,
+  "body": {
+    "content": {
+      "linkedin": {
+        "content": {
+          "postText": "We built Founder Content so a founder can paste a URL and get a week of posts back. Here is what changed for our first users."
+        }
+      },
+      "twitter": { "error": "Caption generation failed for twitter. Try again." }
+    }
+  }
+}

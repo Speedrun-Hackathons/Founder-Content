@@ -1,0 +1,5 @@
+{
+  "source": "recorded 2026-10-11 (POST /mcp without a key)",
+  "status": 401,
+  "body": { "error": "unauthorized", "message": "Invalid or missing API key. Create one in Settings, Developer." }
+}

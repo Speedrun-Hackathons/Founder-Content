@@ -1,0 +1,27 @@
+{
+  "source": "shape recorded 2026-10-11 (GET /posts), ids and URLs replaced",
+  "status": 200,
+  "body": {
+    "id": "post_abc123",
+    "content": "In light of OpenAI solving the Navier Stokes problem...",
+    "platforms": ["linkedin", "twitter"],
+    "mediaUrls": [],
+    "platformData": null,
+    "status": "published",
+    "scheduledFor": null,
+    "publishedAt": "2026-10-01T15:50:00.000Z",
+    "errorMessage": "Failed on X: X rate-limited this post. Retry in a few minutes.",
+    "platformStatuses": {
+      "linkedin": { "status": "published", "postUrl": "https://www.linkedin.com/feed/update/urn:li:share:1" },
+      "twitter": {
+        "error": "X rate-limited this post.",
+        "status": "failed",
+        "nextStep": "Retry in a few minutes.",
+        "rawError": "Failed to post to Twitter: Request failed with code 403",
+        "transient": true,
+        "userActionRequired": false
+      }
+    },
+    "providerPostId": "sp_example"
+  }
+}

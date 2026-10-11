@@ -1,0 +1,5 @@
+{
+  "source": "recorded 2026-10-11 (POST /content/generate)",
+  "status": 400,
+  "body": { "error": { "code": "invalid_request", "message": "The transcript is only 105 characters (minimum 120). There is not enough spoken content to write from." } }
+}
