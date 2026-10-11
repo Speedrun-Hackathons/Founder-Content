@@ -203,6 +203,7 @@ export function createDraft(variantId: string): Post | null {
     platform: found.variant.platform,
     origin: "variant",
     text: found.variant.text,
+    mediaUrls: found.variant.mediaUrls,
     status: "draft",
     scheduledFor: null,
     providerPostId: null,

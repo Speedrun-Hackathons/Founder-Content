@@ -44,6 +44,11 @@ export type ProviderPost = {
   /** The service's summary when a platform failed, e.g. "Failed on X: X rate-limited this post. Retry in a few minutes." */
   errorMessage: string | null;
   platforms: PlatformOutcome[];
+  /** The platforms the post goes to, as the service lists them. */
+  targets: Platform[];
+  mediaUrls: string[];
+  publishedAt: string | null;
+  createdAt: string | null;
 };
 
 export type Caption = { platform: Platform; text: string; error: null } | { platform: Platform; text: null; error: string };
@@ -54,17 +59,18 @@ export function createSocialStreamline(config: { apiKey: string; baseUrl?: strin
   const baseUrl = (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/$/, "");
   const doFetch: FetchLike = config.fetch ?? ((input, init) => fetch(input, init));
 
-  async function call(method: string, path: string, body?: unknown, idempotencyKey?: string): Promise<unknown> {
+  async function call(method: string, path: string, body?: unknown, idempotencyKey?: string, timeoutMs = REQUEST_TIMEOUT_MS): Promise<unknown> {
     const headers: Record<string, string> = { Authorization: `Bearer ${config.apiKey}`, Accept: "application/json" };
-    if (body !== undefined) headers["Content-Type"] = "application/json";
+    const isForm = typeof FormData !== "undefined" && body instanceof FormData;
+    if (body !== undefined && !isForm) headers["Content-Type"] = "application/json";
     if (idempotencyKey) headers["Idempotency-Key"] = idempotencyKey;
 
     const response = await doFetch(`${baseUrl}${path}`, {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : isForm ? (body as FormData) : JSON.stringify(body),
       cache: "no-store",
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     const text = await response.text();
     let json: unknown = undefined;
@@ -129,7 +135,286 @@ export function createSocialStreamline(config: { apiKey: string; baseUrl?: strin
         return [{ id, platform, handle: str(a.accountHandle) ?? str(a.accountName) ?? "", connected: a.connected === true && a.disabled !== true }];
       });
     },
+
+    // ---- posts --------------------------------------------------------------------------------
+
+    /** Newest first. Recorded: { data: Post[], meta: { count, nextCursor } }. */
+    async listPosts(query: { limit?: number; cursor?: string; status?: string } = {}): Promise<Page<ProviderPost>> {
+      const data = record(await call("GET", `/posts${qs(query)}`));
+      return { items: list(data.data).map(readPost), nextCursor: str(record(data.meta).nextCursor) ?? null };
+    },
+
+    /** Edits a post that has not been sent yet. */
+    updatePost: async (id: string, patch: { content?: string; mediaUrls?: string[] }) =>
+      readPost(await call("PATCH", postPath(id), patch)),
+
+    /** Removes the post from the posting service; anything already published stays on the platform. */
+    deletePost: async (id: string) => {
+      await call("DELETE", postPath(id));
+    },
+
+    // ---- credits, media, library ------------------------------------------------------------
+
+    /** Recorded: { creditBalance, persistentCredits, pendingCredits, availableCredits }. */
+    async credits(): Promise<Credits> {
+      const c = record(await call("GET", "/credits"));
+      return { available: num(c.availableCredits), balance: num(c.creditBalance), pending: num(c.pendingCredits) };
+    },
+
+    /** Who the key belongs to. Recorded: { workspaceId, email, role, scopes }. */
+    async me(): Promise<{ workspaceId: string; email: string; role: string }> {
+      const m = record(await call("GET", "/me"));
+      return { workspaceId: str(m.workspaceId) ?? "", email: str(m.email) ?? "", role: str(m.role) ?? "" };
+    },
+
+    /** Uploads one file; the answer carries a public URL a post or a render can use. */
+    async uploadMedia(file: Blob, filename: string): Promise<MediaItem> {
+      const form = new FormData();
+      form.append("file", file, filename);
+      return readMedia(await call("POST", "/media", form, undefined, 300_000));
+    },
+
+    /** Everything uploaded, rendered or generated. Recorded: { data: LibraryItem[], meta }. */
+    async library(query: { kind?: string; source?: string; subtype?: string; q?: string; cursor?: string; limit?: number } = {}): Promise<Page<LibraryItem>> {
+      const data = record(await call("GET", `/library${qs(query)}`));
+      return { items: list(data.data).map(readLibraryItem), nextCursor: str(record(data.meta).nextCursor) ?? null };
+    },
+
+    /** Recorded: { counts: [{ kind, source, subtype, count }], total }. */
+    async libraryCounts(): Promise<{ counts: { kind: string; source: string; subtype: string | null; count: number }[]; total: number }> {
+      const data = record(await call("GET", "/library/counts"));
+      const counts = list(data.counts).map((c) => {
+        const r = record(c);
+        return { kind: str(r.kind) ?? "", source: str(r.source) ?? "", subtype: str(r.subtype) ?? null, count: num(r.count) };
+      });
+      return { counts, total: num(data.total) };
+    },
+
+    deleteLibraryItem: async (id: string) => {
+      await call("DELETE", `/library/${encodeURIComponent(id)}`);
+    },
+
+    async libraryItemPosts(id: string): Promise<ProviderPost[]> {
+      return list(record(await call("GET", `/library/${encodeURIComponent(id)}/posts`)).data).map(readPost);
+    },
+
+    // ---- video renders and jobs ---------------------------------------------------------------
+
+    /** Queues a vertical render from uploaded clips. Spends credits; poll getJob until the status is terminal. */
+    createShortVideo: async (body: ShortVideoRequest, idempotencyKey?: string) =>
+      readJob(await call("POST", "/videos/short", body, idempotencyKey)),
+
+    /** Queues a landscape render with the facecam over the desktop capture. Spends credits. */
+    createLongVideo: async (body: LongVideoRequest, idempotencyKey?: string) =>
+      readJob(await call("POST", "/videos/long", body, idempotencyKey)),
+
+    getJob: async (id: string) => readJob(await call("GET", `/jobs/${encodeURIComponent(id)}`)),
+
+    /** Recorded: { data: Job[], meta }. */
+    async listJobs(query: { kind?: string; status?: string; limit?: number; cursor?: string } = {}): Promise<Page<Job>> {
+      const data = record(await call("GET", `/jobs${qs(query)}`));
+      return { items: list(data.data).map(readJob), nextCursor: str(record(data.meta).nextCursor) ?? null };
+    },
+
+    /** Only short and long renders can be cancelled; it releases their held credits and removes the job. */
+    cancelJob: async (id: string) => {
+      await call("POST", `/jobs/${encodeURIComponent(id)}/cancel`);
+    },
+
+    /** Usually answers pending; asking again with the same mediaId returns the cached record without charging twice. */
+    transcribe: async (mediaUrl: string, mediaId: string) =>
+      readTranscription(await call("POST", "/transcriptions", { mediaUrl, mediaId }, undefined, 60_000)),
+
+    // ---- presets, posting defaults, webhooks --------------------------------------------------
+
+    listPresets: async (platform?: Platform) =>
+      list(record(await call("GET", `/presets${qs({ platform: platform && toApiPlatform(platform) })}`)).data).map(readPreset),
+    createPreset: async (body: { name: string; platform: Platform; settings: Record<string, unknown> }) =>
+      readPreset(await call("POST", "/presets", { ...body, platform: toApiPlatform(body.platform) })),
+    updatePreset: async (id: string, body: { name?: string; settings?: Record<string, unknown> }) =>
+      readPreset(await call("PATCH", `/presets/${encodeURIComponent(id)}`, body)),
+    deletePreset: async (id: string) => {
+      await call("DELETE", `/presets/${encodeURIComponent(id)}`);
+    },
+
+    listCaptionPresets: async () => list(record(await call("GET", "/caption-presets")).data).map(readPreset),
+    createCaptionPreset: async (body: { name: string; settings: Record<string, unknown> }) =>
+      readPreset(await call("POST", "/caption-presets", body)),
+    updateCaptionPreset: async (id: string, body: { name?: string; settings?: Record<string, unknown> }) =>
+      readPreset(await call("PATCH", `/caption-presets/${encodeURIComponent(id)}`, body)),
+    deleteCaptionPreset: async (id: string) => {
+      await call("DELETE", `/caption-presets/${encodeURIComponent(id)}`);
+    },
+
+    /** Recorded: { defaults: { crop, long, image, short, quickpost } }; absent keys mean the flow is unused. */
+    postingDefaults: async () => record(record(await call("GET", "/posting-defaults")).defaults),
+    setPostingDefault: async (key: string, value: Record<string, unknown>) =>
+      call("PUT", `/posting-defaults/${encodeURIComponent(key)}`, { value }),
+
+    listWebhooks: async () => list(record(await call("GET", "/webhooks")).data).map(readWebhook),
+    /** The signing secret comes back once, here, and never again. */
+    async createWebhook(body: { url: string; events: string[]; description?: string }): Promise<Webhook & { secret: string | null }> {
+      const data = record(await call("POST", "/webhooks", body));
+      const inner = record(data.data ?? data);
+      return { ...readWebhook(inner), secret: str(inner.secret) ?? str(data.secret) ?? null };
+    },
+    updateWebhook: async (id: string, body: { url?: string; events?: string[]; description?: string; enabled?: boolean }) =>
+      readWebhook(await call("PATCH", `/webhooks/${encodeURIComponent(id)}`, body)),
+    deleteWebhook: async (id: string) => {
+      await call("DELETE", `/webhooks/${encodeURIComponent(id)}`);
+    },
+    testWebhook: async (id: string) => call("POST", `/webhooks/${encodeURIComponent(id)}/test`),
+    webhookDeliveries: async (id: string) => list(record(await call("GET", `/webhooks/${encodeURIComponent(id)}/deliveries?limit=20`)).data),
   };
+}
+
+export type Page<T> = { items: T[]; nextCursor: string | null };
+
+export type Credits = { available: number; balance: number; pending: number };
+
+export type MediaItem = { id: string; url: string; fileName: string; mimeType: string | null; fileSize: number | null };
+
+export type LibraryItem = {
+  id: string;
+  title: string;
+  kind: "video" | "image" | string;
+  source: string;
+  subtype: string | null;
+  url: string;
+  posterUrl: string | null;
+  durationSec: number | null;
+  createdAt: string | null;
+};
+
+/** queued, running, needs_action, succeeded, failed or cancelled. */
+export type Job = {
+  id: string;
+  kind: string;
+  status: string;
+  detail: string | null;
+  progress: number | null;
+  outputUrls: string[];
+  error: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
+export const TERMINAL_JOB_STATUSES = ["succeeded", "failed", "cancelled"];
+
+export type Clip = { facecamUrl: string; desktopUrl?: string };
+type Toggle = { enabled: boolean };
+export type ShortVideoRequest = {
+  clips: Clip[];
+  mode?: "stacked" | "facecam_only";
+  captions?: Toggle & { language?: string };
+  removeSilence?: Toggle;
+  removeFillerWords?: Toggle;
+};
+export type LongVideoRequest = {
+  clips: Clip[];
+  facecamPosition?: string;
+  facecamScale?: number;
+  captions?: Toggle & { language?: string };
+  removeSilence?: Toggle;
+  faceTracking?: boolean;
+};
+
+export type Transcription = { id: string | null; status: string; text: string | null; error: string | null };
+
+export type Preset = { id: string; name: string; platform: Platform | null; settings: Record<string, unknown>; createdAt: string | null };
+
+export type Webhook = { id: string; url: string; events: string[]; description: string | null; enabled: boolean; failureCount: number | null };
+
+function readMedia(data: unknown): MediaItem {
+  const m = record(record(data).data ?? data);
+  const url = str(m.url);
+  if (!url) throw new SocialStreamlineError(502, "bad_response", "Social Streamline answered the upload without a URL.", null);
+  return { id: str(m.id) ?? "", url, fileName: str(m.fileName) ?? "", mimeType: str(m.mimeType) ?? null, fileSize: typeof m.fileSize === "number" ? m.fileSize : null };
+}
+
+// Recorded: { id, title, kind, source, subtype, url, posterUrl, previewUrl, durationSec, aspectRatio, fileSize, createdAt }
+function readLibraryItem(data: unknown): LibraryItem {
+  const l = record(data);
+  return {
+    id: str(l.id) ?? "",
+    title: str(l.title) ?? "",
+    kind: str(l.kind) ?? "",
+    source: str(l.source) ?? "",
+    subtype: str(l.subtype) ?? null,
+    url: str(l.url) ?? "",
+    posterUrl: str(l.posterUrl) ?? str(l.previewUrl) ?? null,
+    durationSec: typeof l.durationSec === "number" ? l.durationSec : null,
+    createdAt: str(l.createdAt) ?? null,
+  };
+}
+
+// Recorded: { id, kind, status, detailStatus, progress, outputUrls, sourceUrl, postId, errorMessage, createdAt, updatedAt }.
+// A create call is read the same way, accepting { job: ... } or { jobId } around it.
+function readJob(data: unknown): Job {
+  const outer = record(data);
+  const j = record(outer.job ?? outer.data ?? outer);
+  const id = str(j.id) ?? str(j.jobId) ?? str(outer.jobId);
+  if (!id) throw new SocialStreamlineError(502, "bad_response", "Social Streamline answered without a job id.", null);
+  return {
+    id,
+    kind: str(j.kind) ?? "",
+    status: str(j.status) ?? "queued",
+    detail: str(j.detailStatus) ?? null,
+    progress: typeof j.progress === "number" ? j.progress : null,
+    outputUrls: list(j.outputUrls).filter((u): u is string => typeof u === "string"),
+    error: str(j.errorMessage) ?? str(j.error) ?? null,
+    createdAt: str(j.createdAt) ?? null,
+    updatedAt: str(j.updatedAt) ?? null,
+  };
+}
+
+function readTranscription(data: unknown): Transcription {
+  const t = record(record(data).data ?? data);
+  return {
+    id: str(t.id) ?? null,
+    status: str(t.status) ?? "pending",
+    text: str(t.text) ?? str(t.transcript) ?? null,
+    error: str(t.error) ?? str(t.errorMessage) ?? null,
+  };
+}
+
+// Recorded (caption presets): { id, name, settings, createdAt }; platform presets add { platform }.
+function readPreset(data: unknown): Preset {
+  const p = record(record(data).data ?? data);
+  return {
+    id: str(p.id) ?? "",
+    name: str(p.name) ?? "",
+    platform: fromApiPlatform(p.platform),
+    settings: record(p.settings),
+    createdAt: str(p.createdAt) ?? null,
+  };
+}
+
+function readWebhook(data: unknown): Webhook {
+  const w = record(record(data).data ?? data);
+  return {
+    id: str(w.id) ?? "",
+    url: str(w.url) ?? "",
+    events: list(w.events).filter((e): e is string => typeof e === "string"),
+    description: str(w.description) ?? null,
+    enabled: w.enabled !== false,
+    failureCount: typeof w.failureCount === "number" ? w.failureCount : null,
+  };
+}
+
+function qs(query: Record<string, string | number | undefined | null>): string {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) if (value !== undefined && value !== null && value !== "") params.set(key, String(value));
+  const text = params.toString();
+  return text ? `?${text}` : "";
+}
+
+function list(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function num(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
 }
 
 export type SocialStreamline = ReturnType<typeof createSocialStreamline>;
@@ -153,6 +438,13 @@ export function readPost(data: unknown): ProviderPost {
       const s = record(value);
       return [{ platform, status: str(s.status) ?? "unknown", error: str(s.error) ?? null, nextStep: str(s.nextStep) ?? null, url: str(s.postUrl) ?? null }];
     }),
+    targets: list(p.platforms).flatMap((v) => {
+      const platform = fromApiPlatform(v);
+      return platform ? [platform] : [];
+    }),
+    mediaUrls: list(p.mediaUrls).filter((u): u is string => typeof u === "string"),
+    publishedAt: str(p.publishedAt) ?? null,
+    createdAt: str(p.createdAt) ?? null,
   };
 }
 

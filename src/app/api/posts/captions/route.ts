@@ -1,5 +1,7 @@
 // #7: one caption per chosen Platform in the Voice, written by the posting service, and a draft per
 // Platform. A Platform that failed answers with its own error next to the ones that worked.
+// With { mediaUrl, transcript } the captions are written about a video (its transcript joins the
+// Brief) and every draft carries the video, which TikTok and YouTube need.
 
 import { fail, isResponse, json, readJson } from "@/lib/http";
 import { isPlatform, PLATFORMS, type Platform, type Post, type Run } from "@/lib/model";
@@ -26,6 +28,11 @@ export async function POST(req: Request) {
     }
     if (!platforms.includes(value)) platforms.push(value);
   }
+  const mediaUrl = typeof body.mediaUrl === "string" ? body.mediaUrl.trim() : "";
+  if (mediaUrl && !mediaUrl.startsWith("https://")) {
+    return fail("bad_media", `mediaUrl "${mediaUrl}" must be a public https URL.`, 422);
+  }
+  const transcript = typeof body.transcript === "string" ? body.transcript.trim() : "";
 
   let client;
   try {
@@ -40,7 +47,7 @@ export async function POST(req: Request) {
 
   let captions;
   try {
-    captions = await client.generateCaptions(captionTranscript(state.brief.text, state.voice), platforms, `captions:${run.id}`);
+    captions = await client.generateCaptions(captionTranscript(state.brief.text, state.voice, transcript), platforms, `captions:${run.id}`);
   } catch (err) {
     return serviceFailure(err);
   }
@@ -50,7 +57,7 @@ export async function POST(req: Request) {
       if (caption.text === null) return { platform: caption.platform, ok: false, error: caption.error };
       try {
         const provider = await client.createDraft(
-          { content: caption.text, platforms: [caption.platform] },
+          { content: caption.text, platforms: [caption.platform], mediaUrls: mediaUrl ? [mediaUrl] : [] },
           `draft:${run.id}:${caption.platform}`,
         );
         const post: Post = {
@@ -60,6 +67,7 @@ export async function POST(req: Request) {
           platform: caption.platform,
           origin: "caption",
           text: caption.text,
+          mediaUrls: mediaUrl ? [mediaUrl] : [],
           status: "draft",
           scheduledFor: null,
           providerPostId: null,
