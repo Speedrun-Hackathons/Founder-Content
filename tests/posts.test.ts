@@ -7,8 +7,8 @@ import { POST as postSchedule } from "@/app/api/posts/[id]/schedule/route";
 import { POST as postPublish } from "@/app/api/posts/[id]/publish/route";
 import { POST as postRetry } from "@/app/api/posts/[id]/retry/route";
 import { GET as getEvents } from "@/app/api/events/route";
+import { resetSocialStreamline, setSocialStreamline } from "@/lib/social";
 import { installFakeAds, resetAds } from "@/lib/ads/testing";
-import { setSocialStreamlineForTests } from "@/lib/social";
 import { getState, resetStore } from "@/lib/store";
 import { FAKE_API_KEY, fakeSocialStreamline, fixture } from "./fakes/social-streamline";
 
@@ -41,11 +41,12 @@ beforeEach(() => {
   resetStore();
   installFakeAds();
   fake = fakeSocialStreamline();
-  setSocialStreamlineForTests(fake.client);
+  setSocialStreamline(fake.client);
+  installFakeAds();
 });
 
 afterEach(() => {
-  setSocialStreamlineForTests(null);
+  resetSocialStreamline();
   resetAds();
 });
 

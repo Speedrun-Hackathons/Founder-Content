@@ -96,14 +96,16 @@ export type PostStatus = "draft" | "scheduled" | "published" | "failed";
 export type Post = {
   id: string;
   runId: string;
-  /** null for a caption draft, which is written per Platform without A and B Variants. */
-  variantId: string | null;
+  /** Empty for a caption draft (origin "caption"), which is written per Platform without A and B Variants. */
+  variantId: string;
   platform: Platform;
-  text: string;
   status: PostStatus;
   scheduledFor: string | null;
   providerPostId: string | null;
   error: string | null;
+  /** Added by lane B: where the Post came from, and the text it sends. */
+  origin: "variant" | "caption";
+  text: string;
 };
 
 export type RunTime = {

@@ -3,7 +3,7 @@ import { POST as postCompany } from "@/app/api/company/route";
 import { PUT as putBrief } from "@/app/api/brief/route";
 import { POST as postCaptions } from "@/app/api/posts/captions/route";
 import { GET as getPosts } from "@/app/api/posts/route";
-import { setSocialStreamlineForTests } from "@/lib/social";
+import { resetSocialStreamline, setSocialStreamline } from "@/lib/social";
 import { getState, resetStore } from "@/lib/store";
 import { fakeSocialStreamline, fixture } from "./fakes/social-streamline";
 
@@ -21,10 +21,10 @@ let fake: ReturnType<typeof fakeSocialStreamline>;
 beforeEach(() => {
   resetStore();
   fake = fakeSocialStreamline();
-  setSocialStreamlineForTests(fake.client);
+  setSocialStreamline(fake.client);
 });
 
-afterEach(() => setSocialStreamlineForTests(null));
+afterEach(() => resetSocialStreamline());
 
 describe("captions and drafts per Platform", () => {
   it("writes one caption per Platform and makes a draft for each", async () => {
@@ -36,7 +36,7 @@ describe("captions and drafts per Platform", () => {
       ["linkedin", true],
       ["x", true],
     ]);
-    expect(body.results[1].post).toMatchObject({ platform: "x", status: "draft", text: "A twitter caption.", variantId: null });
+    expect(body.results[1].post).toMatchObject({ platform: "x", status: "draft", text: "A twitter caption.", origin: "caption", variantId: "" });
     expect(body.results[1].post.providerPostId).toMatch(/^ss_post_/);
 
     const list = await (await getPosts()).json();
@@ -99,7 +99,7 @@ describe("captions and drafts per Platform", () => {
   });
 
   it("answers 503 when the server has no posting-service key", async () => {
-    setSocialStreamlineForTests(null);
+    resetSocialStreamline();
     const saved = process.env.SOCIAL_STREAMLINE_API_KEY;
     delete process.env.SOCIAL_STREAMLINE_API_KEY;
     try {

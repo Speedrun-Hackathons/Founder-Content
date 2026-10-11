@@ -18,6 +18,6 @@ export async function POST(_req: Request, context: { params: Promise<{ id: strin
     if (err instanceof SocialStreamlineError && err.status < 500 && err.status !== 429) post.error = err.message;
     return serviceFailure(err);
   }
-  recordIfPublished(post, before);
+  await recordIfPublished(post, before);
   return json({ post });
 }

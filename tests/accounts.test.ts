@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { GET as getAccounts } from "@/app/api/accounts/route";
-import { setSocialStreamlineForTests } from "@/lib/social";
+import { resetSocialStreamline, setSocialStreamline } from "@/lib/social";
 import { resetStore } from "@/lib/store";
 import { fakeSocialStreamline, fixture } from "./fakes/social-streamline";
 
@@ -9,10 +9,10 @@ let fake: ReturnType<typeof fakeSocialStreamline>;
 beforeEach(() => {
   resetStore();
   fake = fakeSocialStreamline();
-  setSocialStreamlineForTests(fake.client);
+  setSocialStreamline(fake.client);
 });
 
-afterEach(() => setSocialStreamlineForTests(null));
+afterEach(() => resetSocialStreamline());
 
 describe("accounts from the posting service", () => {
   it("lists connected accounts with platform and handle", async () => {

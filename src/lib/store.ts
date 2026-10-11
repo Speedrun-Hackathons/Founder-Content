@@ -198,6 +198,7 @@ export function createDraft(variantId: string): Post | null {
     runId: found.ad.runId,
     variantId,
     platform: found.variant.platform,
+    origin: "variant",
     text: found.variant.text,
     status: "draft",
     scheduledFor: null,

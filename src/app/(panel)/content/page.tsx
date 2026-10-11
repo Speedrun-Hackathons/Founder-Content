@@ -200,7 +200,7 @@ export default function ContentPage() {
                     <p className="line-clamp-2 text-sm text-zinc-900">{post.text || <span className="text-zinc-400">(no text)</span>}</p>
                     <p className="mt-1 text-xs text-zinc-500">
                       {LABEL[post.platform]}
-                      {post.variantId ? " - from an Ad Variant" : " - caption"}
+                      {post.origin === "variant" ? " - from an Ad Variant" : " - caption"}
                       {post.scheduledFor && ` - ${post.status === "scheduled" ? "sends" : "sent"} ${new Date(post.scheduledFor).toLocaleString()}`}
                     </p>
                     {post.error && <p className="mt-2 text-sm text-amber-700">{post.error}</p>}

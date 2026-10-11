@@ -4,7 +4,8 @@
 import { NextResponse } from "next/server";
 import { fail } from "@/lib/http";
 import type { Post, PostStatus } from "@/lib/model";
-import { markRunPublished, recordEvent } from "@/lib/store";
+import { track } from "@/lib/analytics/events";
+import { markRunPublished } from "@/lib/store";
 import { createSocialStreamline, SocialStreamlineError, type ProviderPost, type SocialStreamline } from "./client";
 
 export { SocialStreamlineError } from "./client";
@@ -12,9 +13,14 @@ export type { Caption, ProviderAccount, ProviderPost, SocialStreamline } from ".
 
 let testClient: SocialStreamline | null = null;
 
-/** Tests install a fake here; pass null to go back to the environment. */
-export function setSocialStreamlineForTests(client: SocialStreamline | null): void {
+/** Tests install a fake here. */
+export function setSocialStreamline(client: SocialStreamline): void {
   testClient = client;
+}
+
+/** Goes back to the client built from the environment. */
+export function resetSocialStreamline(): void {
+  testClient = null;
 }
 
 export function socialStreamline(): SocialStreamline {
@@ -70,8 +76,8 @@ export function isSending(post: Post): boolean {
 }
 
 /** Stamps the Run time and sends post_published once, when a Post first reaches published. */
-export function recordIfPublished(post: Post, before: PostStatus): void {
+export async function recordIfPublished(post: Post, before: PostStatus): Promise<void> {
   if (post.status !== "published" || before === "published") return;
   markRunPublished(post.runId);
-  recordEvent("post_published", { postId: post.id, platform: post.platform });
+  await track("post_published", { postId: post.id, platform: post.platform });
 }
