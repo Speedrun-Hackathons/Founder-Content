@@ -7,6 +7,7 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: "M4 13h6V4H4zM14 20h6v-9h-6zM4 20h6v-3H4zM14 7h6V4h-6z" },
   { href: "/company", label: "Company", icon: "M4 20V8l8-4 8 4v12M9 20v-5h6v5" },
   { href: "/content", label: "Content", icon: "M5 5h14v10H8l-3 3z" },
+  { href: "/blog", label: "Blog", icon: "M6 4h9l3 3v13H6zM9 10h6M9 14h6M9 18h4" },
   { href: "/calendar", label: "Calendar", icon: "M5 6h14v14H5zM5 10h14M9 4v4M15 4v4" },
   { href: "/studio", label: "Studio", icon: "M4 6h11v12H4zM15 10l5-3v10l-5-3" },
   { href: "/library", label: "Library", icon: "M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4" },

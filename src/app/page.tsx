@@ -30,7 +30,7 @@ const PROBLEMS = [
 const STEPS = [
   { title: "Paste your Company URL", body: "Add a deck or a product sheet if you have one. The site reads it all." },
   { title: "Approve the Brief and the Voice", body: "Read what we understood about your product and how you sound. Edit anything." },
-  { title: "Generate two Variants per Platform", body: "Posts, images, Carousels and Ads, each in an A and a B, sized for each Platform." },
+  { title: "Generate for every Platform", body: "Posts, images, Carousels and Ads, each sized and worded for where it goes." },
   { title: "Pick the Winner, schedule the rest", body: "Compare A and B side by side, pick by hand, then publish now or at a send time." },
 ];
 
@@ -38,11 +38,11 @@ const FEATURES = [
   { title: "Brief and Voice", body: "One source of truth about your product and your tone, with banned words you set.", icon: "M4 6h16M4 12h10M4 18h7" },
   { title: "Posts per Platform", body: "Captions written for X, LinkedIn and the rest, each within its own limits.", icon: "M5 5h14v10H8l-3 3z" },
   { title: "Images and Carousels", body: "On-brand images for every post, and Carousels that tell one idea across slides.", icon: "M4 5h16v14H4zM8 14l3-3 5 5M14 10h.01" },
-  { title: "A/B Ads with a Winner", body: "Every Ad comes in two Variants with different angles. You choose what keeps running.", icon: "M5 5h6v14H5zM13 5h6v14h-6zM15 12l1.5 1.5L19 11" },
-  { title: "Schedule or publish", body: "Drafts first, always. Then a send time, or publish on the spot for a launch.", icon: "M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" },
-  { title: "One analytics panel", body: "Reach and engagement for Posts, and numbers for each Variant, without opening nine apps.", icon: "M5 19V9M12 19V5M19 19v-7" },
-  { title: "Run time, measured", body: "Every Run is timed from URL to first Post, so the hours you get back are counted.", icon: "M4 12h4l2-5 4 10 2-5h4" },
-  { title: "Video from your clips", body: "Short vertical cuts for TikTok and Reels, long ones for YouTube.", icon: "M4 6h12v12H4zM16 10l4-2v8l-4-2", soon: true },
+  { title: "A/B tested Ads", body: "Every Ad comes in an A and a B with different angles, each with its own numbers, so the pick is not a guess.", icon: "M5 5h6v14H5zM13 5h6v14h-6zM15 12l1.5 1.5L19 11" },
+  { title: "Schedule or publish", body: "Pick a send time for each post, or publish on the spot for a launch. Retry only the Platforms that failed.", icon: "M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" },
+  { title: "One analytics panel", body: "Reach and engagement for every post, and numbers for each Variant, in one place.", icon: "M5 19V9M12 19V5M19 19v-7" },
+  { title: "Blog posts", body: "Long-form posts written from your Brief, ready to publish on your site and promote on social.", icon: "M6 4h9l3 3v13H6zM9 10h6M9 14h6M9 18h4" },
+  { title: "Video from your clips", body: "Short vertical cuts for TikTok and Reels, long ones for YouTube, captioned and ready to post.", icon: "M4 6h12v12H4zM16 10l4-2v8l-4-2" },
 ];
 
 export default async function Home() {
@@ -80,13 +80,13 @@ export default async function Home() {
               For solo founders and small teams
             </span>
             <h1 className="mt-6 text-5xl font-semibold leading-[1.05] sm:text-6xl">
-              Paste your URL.
+              Get a month&apos;s posts in <span className="text-coral-400">60 seconds</span>
               <br />
-              Get a week of posts and <span className="text-coral-400">tested</span> Ads.
+              and not 60 hours.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/70">
-              SocialCoFounder reads your site, writes a Brief and a Voice you approve, then makes posts, images, Carousels and
-              Ads in two Variants for every Platform. You pick the Winner. It schedules the rest.
+              Paste your company URL once. SocialCoFounder learns your product and how you sound, then keeps your feeds full
+              while you get back to building.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link
@@ -99,7 +99,7 @@ export default async function Home() {
                 See how it works
               </a>
             </div>
-            <p className="mt-6 text-sm text-white/50">Nine Platforms. Drafts first. Nothing goes out without your look.</p>
+            <p className="mt-6 text-sm text-white/50">Drafts first. Nothing goes out without your look.</p>
           </div>
           <HeroMock />
         </div>
@@ -121,7 +121,7 @@ export default async function Home() {
 
       <section id="how" className="scroll-mt-8 border-y border-zinc-200 bg-white">
         <div className="mx-auto max-w-6xl px-6 py-24">
-          <SectionTitle eyebrow="How it works" title="From one link to a scheduled week, in four steps." />
+          <SectionTitle eyebrow="How it works" title="From one link to a scheduled month, in four steps." />
           <ol className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {STEPS.map((s, i) => (
               <li key={s.title} className="relative rounded-2xl bg-canvas p-6">
@@ -147,7 +147,6 @@ export default async function Home() {
                     <path d={f.icon} />
                   </svg>
                 </span>
-                {f.soon && <span className="rounded-full bg-coral-400/15 px-2 py-0.5 text-[11px] font-medium text-coral-500">Coming soon</span>}
               </div>
               <h3 className="mt-5 font-semibold">{f.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-zinc-600">{f.body}</p>
@@ -170,7 +169,7 @@ export default async function Home() {
       <section className="px-6 pb-24">
         <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-3xl bg-ink px-8 py-16 text-white sm:px-16">
           <div className="absolute inset-0 -z-10 bg-cover bg-center opacity-80" style={{ backgroundImage: "url(/landing/hero-bg.svg)" }} aria-hidden />
-          <div className="grid items-center gap-10 lg:grid-cols-[1.4fr_1fr]">
+          <div className="max-w-2xl">
             <div>
               <p className="text-sm font-medium text-coral-300">Measured, not claimed</p>
               <h2 className="mt-3 text-4xl font-semibold leading-tight">Give your week back to the product.</h2>
@@ -184,12 +183,6 @@ export default async function Home() {
               >
                 {cta.label} &rarr;
               </Link>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <BigStat value="1-3 h" label="a week by hand, from the survey" />
-              <BigStat value="2" label="Variants for every Platform" />
-              <BigStat value="9" label="Platforms from one panel" />
-              <BigStat value="0" label="posts sent without your look" />
             </div>
           </div>
         </div>
@@ -213,15 +206,6 @@ function SectionTitle({ eyebrow, title }: { eyebrow: string; title: string }) {
     <div className="max-w-2xl">
       <p className="text-sm font-semibold text-brand-600">{eyebrow}</p>
       <h2 className="mt-3 text-balance text-4xl font-semibold leading-tight text-ink">{title}</h2>
-    </div>
-  );
-}
-
-function BigStat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
-      <div className="font-display text-3xl font-semibold">{value}</div>
-      <div className="mt-1 text-xs leading-snug text-white/60">{label}</div>
     </div>
   );
 }
