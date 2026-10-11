@@ -4,7 +4,16 @@ import { api } from "@/lib/client";
 import type { Brief, Company, Document, Voice } from "@/lib/model";
 import { useEffect, useState } from "react";
 
-type CompanyState = { company: Company | null; documents: Document[]; brief: Brief | null; voice: Voice | null };
+type Archive = { kind: "postgres" | "memory"; error: string | null };
+type Version = { brief: string; voice: Voice | null; approved: boolean; savedAt: string };
+type CompanyState = {
+  company: Company | null;
+  documents: Document[];
+  brief: Brief | null;
+  voice: Voice | null;
+  archive?: Archive;
+  history?: Version[];
+};
 type NewDocument = { filename: string; text: string };
 
 const TEXT_FILE = /\.(txt|md|markdown|csv|json|html?)$/i;
@@ -36,6 +45,16 @@ export default function CompanyPage() {
   }
 
   useEffect(load, []);
+
+  /** Puts a saved version into the editor; it is kept only once saved again. */
+  function restore(version: Version) {
+    setBriefText(version.brief);
+    if (version.voice) {
+      setTone(version.voice.tone);
+      setRules(version.voice.rules.join("\n"));
+      setBanned(version.voice.bannedWords.join(", "));
+    }
+  }
 
   async function addFiles(files: FileList | null) {
     if (!files) return;
@@ -202,6 +221,36 @@ export default function CompanyPage() {
               {state.brief.approved ? "Save and keep approved" : "Approve the Brief"}
             </button>
           </div>
+          {state.archive && (
+            <p className={`mt-3 text-xs ${state.archive.error ? "text-amber-700" : "text-zinc-500"}`}>
+              {state.archive.error ??
+                (state.archive.kind === "postgres"
+                  ? "Saved in the database, so it survives restarts and redeploys."
+                  : "Kept in memory only: set DATABASE_URL to keep it across restarts.")}
+            </p>
+          )}
+        </section>
+      )}
+
+      {state.history && state.history.length > 1 && (
+        <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-5">
+          <h2 className="text-sm font-semibold">Earlier versions</h2>
+          <ul className="mt-2 divide-y divide-zinc-100">
+            {state.history.map((version, i) => (
+              <li key={`${version.savedAt}-${i}`} className="flex items-start gap-3 py-2 text-sm">
+                <span className="w-36 shrink-0 text-xs text-zinc-500">
+                  {new Date(version.savedAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                  {version.approved && <span className="ml-1 text-green-700">approved</span>}
+                </span>
+                <span className="line-clamp-2 flex-1 text-zinc-700">{version.brief}</span>
+                {i > 0 && (
+                  <button onClick={() => restore(version)} className="shrink-0 text-xs underline">
+                    Restore
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
         </section>
       )}
     </div>

@@ -43,6 +43,7 @@ export default function ContentPage() {
   const [tab, setTab] = useState<Tab>("all");
   const [error, setError] = useState("");
   const [when, setWhen] = useState("");
+  const [editing, setEditing] = useState<{ id: string; text: string } | null>(null);
 
   function load() {
     api<{ posts: Post[] }>("/api/posts")
@@ -88,6 +89,39 @@ export default function ContentPage() {
     try {
       const body = action === "schedule" ? JSON.stringify({ scheduledFor: when ? new Date(when).toISOString() : tomorrow() }) : undefined;
       await api(`/api/posts/${post.id}/${action}`, { method: "POST", body });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(null);
+      load();
+    }
+  }
+
+  async function saveEdit() {
+    if (!editing) return;
+    setError("");
+    setBusy(editing.id);
+    try {
+      await api(`/api/posts/${editing.id}`, { method: "PATCH", body: JSON.stringify({ text: editing.text }) });
+      setEditing(null);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(null);
+      load();
+    }
+  }
+
+  async function remove(post: Post) {
+    const warning =
+      post.status === "published"
+        ? "Delete this Post here and in Social Streamline? What already went out stays on the platform."
+        : "Delete this Post here and in Social Streamline?";
+    if (!window.confirm(warning)) return;
+    setError("");
+    setBusy(post.id);
+    try {
+      await api(`/api/posts/${post.id}`, { method: "DELETE" });
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -196,8 +230,38 @@ export default function ContentPage() {
             {shown.map((post) => (
               <li key={post.id} className="rounded-lg border border-zinc-200 bg-white p-4">
                 <div className="flex items-start gap-4">
+                  {post.mediaUrls?.[0] &&
+                    (/\.(mp4|mov|webm)(\?|$)/i.test(post.mediaUrls[0]) ? (
+                      <video src={post.mediaUrls[0]} muted className="h-16 w-16 shrink-0 rounded-md bg-black object-cover" />
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={post.mediaUrls[0]} alt="" className="h-16 w-16 shrink-0 rounded-md border border-zinc-200 object-cover" />
+                    ))}
                   <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 text-sm text-zinc-900">{post.text || <span className="text-zinc-400">(no text)</span>}</p>
+                    {editing?.id === post.id ? (
+                      <div>
+                        <textarea
+                          value={editing.text}
+                          onChange={(e) => setEditing({ id: post.id, text: e.target.value })}
+                          className="h-28 w-full rounded-md border border-zinc-300 px-2 py-1 text-sm"
+                        />
+                        <div className="mt-1 flex gap-2">
+                          <button
+                            onClick={saveEdit}
+                            disabled={busy === post.id || !editing.text.trim()}
+                            className="rounded-md bg-zinc-900 px-3 py-1 text-xs text-white disabled:opacity-50"
+                          >
+                            Save
+                          </button>
+                          <button onClick={() => setEditing(null)} className="rounded-md border border-zinc-300 px-3 py-1 text-xs">
+                            Cancel
+                          </button>
+                          <span className="self-center text-xs text-zinc-500">{editing.text.length} characters</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="line-clamp-2 text-sm text-zinc-900">{post.text || <span className="text-zinc-400">(no text)</span>}</p>
+                    )}
                     <p className="mt-1 text-xs text-zinc-500">
                       {LABEL[post.platform]}
                       {post.origin === "variant" ? " - from an Ad Variant" : " - caption"}
@@ -233,6 +297,18 @@ export default function ContentPage() {
                         </button>
                       </>
                     ) : null}
+                    {post.status === "draft" && editing?.id !== post.id && (
+                      <button onClick={() => setEditing({ id: post.id, text: post.text })} className="rounded-md border border-zinc-300 px-3 py-1 text-xs">
+                        Edit
+                      </button>
+                    )}
+                    <button
+                      onClick={() => remove(post)}
+                      disabled={busy === post.id}
+                      className="rounded-md border border-red-200 px-3 py-1 text-xs text-red-700 disabled:opacity-50"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               </li>
