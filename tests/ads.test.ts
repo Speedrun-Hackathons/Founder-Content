@@ -14,7 +14,9 @@ import { POST as postSchedule } from "@/app/api/posts/[id]/schedule/route";
 import { POST as postPublish } from "@/app/api/posts/[id]/publish/route";
 import { fileImageStore, resetImageStore } from "@/lib/ads/media";
 import { type FakeAdsAI, installFakeAds, PNG, resetAds } from "@/lib/ads/testing";
+import { setSocialStreamlineForTests } from "@/lib/social";
 import { getState, resetStore } from "@/lib/store";
+import { fakeSocialStreamline } from "./fakes/social-streamline";
 
 type AdBody = { id: string; platform: string; winnerVariantId: string | null; variants: { id: string; label: string }[] };
 
@@ -54,9 +56,11 @@ let ai: FakeAdsAI;
 beforeEach(() => {
   resetStore();
   ai = installFakeAds().ai;
+  setSocialStreamlineForTests(fakeSocialStreamline().client);
 });
 
 afterEach(() => {
+  setSocialStreamlineForTests(null);
   resetAds();
   vi.unstubAllEnvs();
 });

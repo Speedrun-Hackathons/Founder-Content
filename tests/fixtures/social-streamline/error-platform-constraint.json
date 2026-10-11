@@ -1,0 +1,5 @@
+{
+  "source": "envelope recorded 2026-10-11 (POST /content/generate 400); code and message assumed",
+  "status": 400,
+  "body": { "error": { "code": "platform_constraint", "message": "Instagram needs an image or video to publish." } }
+}

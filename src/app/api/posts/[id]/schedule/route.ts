@@ -1,5 +1,6 @@
 import { fail, isResponse, json, readJson } from "@/lib/http";
-import { findPost, newId } from "@/lib/store";
+import { applyProviderPost, serviceFailure, socialStreamline, SocialStreamlineError } from "@/lib/social";
+import { findPost } from "@/lib/store";
 
 export async function POST(req: Request, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
@@ -13,9 +14,16 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
   }
   if (when <= Date.now()) return fail("past_time", "scheduledFor must be in the future.", 422);
   if (post.status === "published") return fail("already_published", `Post ${id} is already published.`, 409);
-  post.status = "scheduled";
-  post.scheduledFor = new Date(when).toISOString();
-  post.providerPostId = post.providerPostId ?? newId("provider");
-  post.error = null;
+  if (!post.providerPostId) return fail("no_provider_post", `Post ${id} has no draft in the posting service.`, 409);
+
+  const scheduledFor = new Date(when).toISOString();
+  try {
+    const provider = await socialStreamline().schedulePost(post.providerPostId, scheduledFor, `schedule:${post.providerPostId}:${scheduledFor}`);
+    applyProviderPost(post, provider);
+    post.scheduledFor = provider.scheduledFor ?? scheduledFor;
+  } catch (err) {
+    if (err instanceof SocialStreamlineError && err.status < 500 && err.status !== 429) post.error = err.message;
+    return serviceFailure(err);
+  }
   return json({ post });
 }

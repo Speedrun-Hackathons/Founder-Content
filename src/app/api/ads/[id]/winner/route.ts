@@ -6,7 +6,7 @@ function lockedPost(ad: Ad) {
   const variantIds = ad.variants.map((v) => v.id);
   return (
     getState().posts.find(
-      (p) => variantIds.includes(p.variantId) && (p.status === "scheduled" || p.status === "published"),
+      (p) => p.variantId !== null && variantIds.includes(p.variantId) && (p.status === "scheduled" || p.status === "published"),
     ) ?? null
   );
 }

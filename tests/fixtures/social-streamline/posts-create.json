@@ -1,0 +1,20 @@
+{
+  "source": "recorded 2026-10-11 (POST /posts), id replaced",
+  "status": 200,
+  "body": {
+    "id": "post_abc123",
+    "content": "Recording a draft shape. This draft is deleted right after.",
+    "platforms": ["linkedin"],
+    "mediaUrls": [],
+    "platformData": null,
+    "status": "draft",
+    "scheduledFor": null,
+    "publishedAt": null,
+    "createdAt": "2026-10-11T20:43:09.309Z",
+    "contentType": null,
+    "thumbnailUrl": null,
+    "errorMessage": null,
+    "platformStatuses": null,
+    "providerPostId": null
+  }
+}

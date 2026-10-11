@@ -96,8 +96,10 @@ export type PostStatus = "draft" | "scheduled" | "published" | "failed";
 export type Post = {
   id: string;
   runId: string;
-  variantId: string;
+  /** null for a caption draft, which is written per Platform without A and B Variants. */
+  variantId: string | null;
   platform: Platform;
+  text: string;
   status: PostStatus;
   scheduledFor: string | null;
   providerPostId: string | null;
