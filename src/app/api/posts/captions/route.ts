@@ -4,6 +4,7 @@
 // Brief) and every draft carries the video, which TikTok and YouTube need.
 
 import { fail, isResponse, json, readJson } from "@/lib/http";
+import { ensureCompanyLoaded } from "@/lib/content/archive";
 import { isPlatform, PLATFORMS, type Platform, type Post, type Run } from "@/lib/model";
 import { applyProviderPost, serviceFailure, socialStreamline } from "@/lib/social";
 import { captionTranscript } from "@/lib/social/transcript";
@@ -14,6 +15,7 @@ type Result = { platform: Platform; ok: true; post: Post } | { platform: Platfor
 export async function POST(req: Request) {
   const body = await readJson(req);
   if (isResponse(body)) return body;
+  await ensureCompanyLoaded();
   const state = getState();
   if (!state.brief) return fail("no_brief", "No Brief yet. Add the Company URL first.", 404);
   if (!state.brief.approved) {
@@ -47,7 +49,7 @@ export async function POST(req: Request) {
 
   let captions;
   try {
-    captions = await client.generateCaptions(captionTranscript(state.brief.text, state.voice, transcript), platforms, `captions:${run.id}`);
+    captions = await client.generateCaptions(captionTranscript(state.brief.text, state.voice, transcript, state.documents), platforms, `captions:${run.id}`);
   } catch (err) {
     return serviceFailure(err);
   }

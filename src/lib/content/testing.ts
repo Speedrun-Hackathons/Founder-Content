@@ -2,6 +2,7 @@
 // call installFakeContent() in beforeEach and resetContent() in afterEach.
 
 import { resetBriefAI, setBriefAI, type BriefAI, type BriefDraft, type BriefRequest } from "./ai";
+import { memoryArchive, resetCompanyArchive, setCompanyArchive, type CompanyArchive } from "./archive";
 import { resetSiteReader, setSiteReader, type SitePage, type SiteReader } from "./site";
 
 export class FakeBriefAI implements BriefAI {
@@ -38,15 +39,19 @@ export class FakeSiteReader implements SiteReader {
   }
 }
 
-export function installFakeContent(): { ai: FakeBriefAI; site: FakeSiteReader } {
+/** Fakes OpenAI and the site reader, and starts an empty in-memory archive for the Company. */
+export function installFakeContent(): { ai: FakeBriefAI; site: FakeSiteReader; archive: CompanyArchive } {
   const ai = new FakeBriefAI();
   const site = new FakeSiteReader();
+  const archive = memoryArchive();
   setBriefAI(ai);
   setSiteReader(site);
-  return { ai, site };
+  setCompanyArchive(archive);
+  return { ai, site, archive };
 }
 
 export function resetContent(): void {
   resetBriefAI();
   resetSiteReader();
+  resetCompanyArchive();
 }

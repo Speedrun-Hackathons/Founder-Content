@@ -2,6 +2,7 @@ import { generateAds, saveFailures } from "@/lib/ads/generate";
 import { publicBaseUrl } from "@/lib/ads/media";
 import { fail, isResponse, json, readJson } from "@/lib/http";
 import { isPlatform, PLATFORMS, type Platform, type Run } from "@/lib/model";
+import { ensureCompanyLoaded } from "@/lib/content/archive";
 import { getState, newId, now, recordEvent } from "@/lib/store";
 
 export function GET() {
@@ -11,6 +12,7 @@ export function GET() {
 export async function POST(req: Request) {
   const body = await readJson(req);
   if (isResponse(body)) return body;
+  await ensureCompanyLoaded();
   const state = getState();
   if (!state.brief) return fail("no_brief", "No Brief yet. Add the Company URL first.", 404);
   if (!state.brief.approved) {
