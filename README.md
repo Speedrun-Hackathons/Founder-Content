@@ -58,6 +58,12 @@ Every route answers JSON; an error is `{ "error": code, "message": text }` with 
 
 Railway reads `railway.json`: Nixpacks build, `npm run start`, health check on `/api/health`. Set the variables above in the Railway service; the app listens on the port Railway provides.
 
+## Limits of this build
+
+- The API routes carry no session check; the panel pages do. Anyone with the URL can call a route, so the deployment stays private until a route guard lands.
+- The store is one in-process object shared by every signed-in user and reset on every restart; the live services replace it lane by lane.
+- Any Google account can sign in; there is no allowlist.
+
 ## Not in the repository
 
 Keys and secrets (`.env`), the OAuth client, the Railway project, the posting-service workspace and its connected accounts.
