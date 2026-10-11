@@ -24,7 +24,7 @@ Open http://localhost:3000. Every panel page needs a signed-in session; without 
 | AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET | Google sign-in (an OAuth client from the Google Cloud console, redirect URI `BASE_URL/api/auth/callback/google`) |
 | AUTH_URL | the public base URL of the deployment |
 | OPENAI_API_KEY | Brief, Voice, ad text, images |
-| KEEWANO_API_KEY | the event stream; empty means events stay local and `/api/events` reports `off (no KEEWANO_API_KEY)` |
+| KEEWANO_API_KEY | not used yet: sending events to Keewano is parked, and events stay in the store |
 | SOCIAL_STREAMLINE_API_KEY, SOCIAL_STREAMLINE_MCP_URL | captions, drafts, scheduling, publishing, accounts, analytics |
 
 Keys are passed between teammates directly, never through the repository.

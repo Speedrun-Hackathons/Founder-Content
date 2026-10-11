@@ -15,7 +15,6 @@ beforeEach(() => {
   resetStore();
   resetPostAnalyticsSource();
   vi.stubEnv("SOCIAL_STREAMLINE_API_KEY", "");
-  vi.stubEnv("KEEWANO_API_KEY", "");
 });
 
 afterEach(() => {

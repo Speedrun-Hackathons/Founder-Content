@@ -1,10 +1,9 @@
-import { lastSendError, sinkLabel, trackWithResult } from "@/lib/analytics/events";
 import { fail, isResponse, json, readJson } from "@/lib/http";
 import { EVENT_TYPES, isEventType } from "@/lib/model";
-import { getState } from "@/lib/store";
+import { getState, recordEvent } from "@/lib/store";
 
 export function GET() {
-  return json({ events: getState().events, sink: sinkLabel(), lastSendError: lastSendError() });
+  return json({ events: getState().events });
 }
 
 export async function POST(req: Request) {
@@ -14,6 +13,6 @@ export async function POST(req: Request) {
     return fail("bad_event", `Unknown event "${String(body.type)}". Choose from: ${EVENT_TYPES.join(", ")}.`, 422);
   }
   const data = body.data && typeof body.data === "object" && !Array.isArray(body.data) ? (body.data as Record<string, unknown>) : {};
-  const result = await trackWithResult(body.type, data);
-  return json({ recorded: true, sent: result.sent, sink: sinkLabel(), ...(result.error ? { sendError: result.error } : {}) }, 202);
+  recordEvent(body.type, data);
+  return json({ recorded: true }, 202);
 }

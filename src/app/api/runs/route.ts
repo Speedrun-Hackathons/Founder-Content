@@ -1,9 +1,8 @@
 import { generateAds, saveFailures } from "@/lib/ads/generate";
 import { publicBaseUrl } from "@/lib/ads/media";
-import { track } from "@/lib/analytics/events";
 import { fail, isResponse, json, readJson } from "@/lib/http";
 import { isPlatform, PLATFORMS, type Platform, type Run } from "@/lib/model";
-import { getState, newId, now } from "@/lib/store";
+import { getState, newId, now, recordEvent } from "@/lib/store";
 
 export function GET() {
   return json({ runs: getState().runs });
@@ -39,7 +38,7 @@ export async function POST(req: Request) {
     runTimeSeconds: null,
   };
   state.runs.push(run);
-  await track("run_started", { runId: run.id, platforms });
+  recordEvent("run_started", { runId: run.id, platforms });
   const { ads, failures } = await generateAds({
     run,
     brief: state.brief.text,
@@ -50,7 +49,7 @@ export async function POST(req: Request) {
   state.ads.push(...ads);
   saveFailures(run.id, failures);
   for (const ad of ads) {
-    await track("variant_generated", { adId: ad.id, platform: ad.platform, variants: ad.variants.map((v) => v.id) });
+    recordEvent("variant_generated", { adId: ad.id, platform: ad.platform, variants: ad.variants.map((v) => v.id) });
   }
   return json({ run, ads, failures }, 201);
 }

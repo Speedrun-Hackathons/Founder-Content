@@ -27,7 +27,7 @@ A ticket counts as done when `npm test`, `npm run lint` and `npm run build` are 
 
 ## Architecture
 
-- **Next.js App Router, one deploy.** Every external call (OpenAI, Social Streamline, Keewano) runs in a route under `src/app/api/`. Pages under `src/app/(panel)/` are client components that call only the site's own routes, through `api()` in `src/lib/client.ts`.
+- **Next.js App Router, one deploy.** Every external call (OpenAI, Social Streamline) runs in a route under `src/app/api/`. Pages under `src/app/(panel)/` are client components that call only the site's own routes, through `api()` in `src/lib/client.ts`.
 - **Shared contract:**
   - `src/lib/model.ts` holds the types and the nine `PLATFORMS`.
   - `src/lib/store.ts` is an in-process store, seeded with stand-in data and reset on every restart. It serves every user and has no database.
@@ -41,7 +41,6 @@ A ticket counts as done when `npm test`, `npm run lint` and `npm run build` are 
 - **External services sit behind small swappable interfaces.** Each has a module-level getter and setter, and tests install fakes through the setter:
   - OpenAI: `setAdsAI` in `src/lib/ads/ai.ts`.
   - Image storage: `setImageStore` in `src/lib/ads/media.ts`.
-  - Keewano: `setEventSink` in `src/lib/analytics/events.ts`.
   - Posting-service analytics: `setPostAnalyticsSource` in `src/lib/analytics/posting-service.ts`.
 - **OpenAI is called with `fetch`, not the SDK.**
   - Ad text comes from Chat Completions with a strict JSON schema. The model is `OPENAI_TEXT_MODEL`, default `gpt-5-mini`.
@@ -53,9 +52,7 @@ A ticket counts as done when `npm test`, `npm run lint` and `npm run build` are 
   - A Platform that fails gives `{ platform, error }` and creates no Ad.
   - TikTok and YouTube fail at once, because the posting service accepts only video for them.
 - **Media** is written to `MEDIA_DIR` (default: an OS temp dir) and served by `/api/ads/media/[file]`. Public links use `PUBLIC_BASE_URL`, falling back to `AUTH_URL`. The posting service accepts media only by public https URL.
-- **Events:**
-  - Lane C routes call `track()` from `src/lib/analytics/events.ts`, which records the event in the store and sends it to Keewano when `KEEWANO_API_KEY` is set. `track()` never throws.
-  - Events recorded through `store.recordEvent` reach Keewano only if the integrator adds the `forwardEvent` hook to `store.ts`.
+- **Events:** the five event types are recorded in the store with `recordEvent` and read back through `/api/events`. Sending them to Keewano is parked; issue #14 says how to restore it.
 - **Posting service:** Social Streamline over MCP, JSON-RPC over HTTPS with SSE responses; `docs/HANDOFF-LANE-B.md` has the protocol. The site never calls a social platform directly. Posts go draft, then schedule or publish.
 
 ## Tests
