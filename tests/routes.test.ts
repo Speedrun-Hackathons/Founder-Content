@@ -11,6 +11,7 @@ import { POST as postPublish } from "@/app/api/posts/[id]/publish/route";
 import { GET as getAccounts } from "@/app/api/accounts/route";
 import { GET as getAnalytics } from "@/app/api/analytics/route";
 import { GET as getEvents, POST as postEvents } from "@/app/api/events/route";
+import { installFakeAds } from "@/lib/ads/testing";
 import { resetStore } from "@/lib/store";
 
 function post(path: string, body: unknown): Request {
@@ -38,7 +39,10 @@ async function approvedBrief() {
   await putBrief(put("/api/brief", { approved: true }));
 }
 
-beforeEach(() => resetStore());
+beforeEach(() => {
+  resetStore();
+  installFakeAds();
+});
 
 describe("health", () => {
   it("answers ok with a build id", async () => {
