@@ -1,6 +1,9 @@
+import { adVariantAnalytics } from "@/lib/analytics/ad-variants";
+import { loadPostAnalytics } from "@/lib/analytics/posting-service";
 import { json } from "@/lib/http";
-import { adAnalytics, postAnalytics, timeSaved } from "@/lib/store";
+import { adAnalytics, timeSaved } from "@/lib/store";
 
-export function GET() {
-  return json({ posts: postAnalytics(), ads: adAnalytics(), timeSaved: timeSaved() });
+export async function GET() {
+  const posts = await loadPostAnalytics();
+  return json({ ...posts, ads: adAnalytics(), adVariants: adVariantAnalytics(), timeSaved: timeSaved() });
 }

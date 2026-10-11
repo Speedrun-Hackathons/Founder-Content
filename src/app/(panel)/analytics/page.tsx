@@ -1,10 +1,28 @@
 "use client";
 
 import { api } from "@/lib/client";
-import type { AnalyticsRow, TimeSaved } from "@/lib/model";
+import type { AnalyticsRow, Platform, TimeSaved, VariantLabel } from "@/lib/model";
 import { useEffect, useState } from "react";
 
-type AnalyticsResponse = { posts: AnalyticsRow[]; ads: AnalyticsRow[]; timeSaved: TimeSaved };
+type AdVariantRow = {
+  adId: string;
+  variantId: string;
+  platform: Platform;
+  label: VariantLabel;
+  impressions: number;
+  clicks: number;
+  clickRate: number;
+  standIn: true;
+};
+
+type AnalyticsResponse = {
+  posts: AnalyticsRow[];
+  ads: AnalyticsRow[];
+  adVariants: AdVariantRow[];
+  timeSaved: TimeSaved;
+  postsSource: string;
+  postsError?: string;
+};
 
 export default function AnalyticsPage() {
   const [data, setData] = useState<AnalyticsResponse | null>(null);
@@ -22,8 +40,8 @@ export default function AnalyticsPage() {
       {error && <p className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>}
       {data && (
         <>
-          <Table title="Posts" rows={data.posts} />
-          <Table title="Ads" rows={data.ads} />
+          <PostsTable rows={data.posts} source={data.postsSource} error={data.postsError} />
+          <VariantTable rows={data.adVariants ?? []} />
           <section className="mt-8 rounded-xl border border-zinc-200 bg-white p-5">
             <h2 className="font-semibold">Time saved</h2>
             <p className="mt-2 text-sm">
@@ -38,10 +56,10 @@ export default function AnalyticsPage() {
   );
 }
 
-function Table({ title, rows }: { title: string; rows: AnalyticsRow[] }) {
+function PostsTable({ rows, source, error }: { rows: AnalyticsRow[]; source: string; error?: string }) {
   return (
     <section className="mt-6">
-      <h2 className="font-semibold">{title}</h2>
+      <h2 className="font-semibold">Posts</h2>
       {rows.length === 0 ? (
         <p className="mt-2 text-sm text-zinc-600">Nothing published yet.</p>
       ) : (
@@ -63,6 +81,43 @@ function Table({ title, rows }: { title: string; rows: AnalyticsRow[] }) {
                 <td>{row.impressions}</td>
                 <td>{row.engagements}</td>
                 <td>{row.standIn ? "stand-in numbers" : "measured"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {source && <p className="mt-2 text-xs text-zinc-500">{source}</p>}
+      {error && <p className="mt-2 max-w-2xl rounded-md bg-amber-50 p-3 text-sm text-amber-800">{error}</p>}
+    </section>
+  );
+}
+
+function VariantTable({ rows }: { rows: AdVariantRow[] }) {
+  return (
+    <section className="mt-8">
+      <h2 className="font-semibold">Ad Variants</h2>
+      <p className="mt-1 text-xs text-zinc-500">Stand-in numbers until an ads analytics source exists.</p>
+      {rows.length === 0 ? (
+        <p className="mt-2 text-sm text-zinc-600">No Ads yet.</p>
+      ) : (
+        <table className="mt-2 w-full max-w-2xl text-sm">
+          <thead className="text-left text-zinc-500">
+            <tr>
+              <th className="py-1">Platform</th>
+              <th>Variant</th>
+              <th>Impressions</th>
+              <th>Clicks</th>
+              <th>Click rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={`${row.adId}:${row.variantId}`} className="border-t border-zinc-200">
+                <td className="py-1">{row.platform}</td>
+                <td>{row.label}</td>
+                <td>{row.impressions}</td>
+                <td>{row.clicks}</td>
+                <td>{(row.clickRate * 100).toFixed(1)}%</td>
               </tr>
             ))}
           </tbody>
