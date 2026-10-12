@@ -1,5 +1,7 @@
 # Founder Content
 
+**Live at [socialcofounder.com](https://socialcofounder.com)**
+
 Founder Content takes a company URL and turns it into social posts and ads: it builds a Brief and a Voice from the site, generates two Variants per platform, lets the Founder pick the Winner, and schedules or publishes the result to the connected social accounts. Built at SpeedHacks, the SF Tech Week hackathon, on 2026-10-11.
 
 Documents: [CONTEXT.md](CONTEXT.md) (the glossary), [docs/SPEC.md](docs/SPEC.md) (the spec), [docs/adr/](docs/adr/) (decisions), [docs/agents/](docs/agents/) (issue tracker and label conventions).
